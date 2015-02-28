@@ -1,0 +1,46 @@
+#!/bin/bash
+
+[[ -f ./tools ]] && source ./tools
+[[ -f ./scripts/tools ]] && source ./scripts/tools
+source $ROOT/scripts/credentials
+
+# Step 3: Create a bucket
+
+#echo bucket input: $1
+
+bucket=$(bucketName $1)
+
+if [[ $bucket == "" ]]; then
+	echo "Error: missing bucket name or invalid!"
+	exit
+fi
+
+bucketType=$2
+
+if [[ $bucketType == "" ]]; then
+	bucketType="transient"
+fi
+
+# Does it exist already? (see bucketCheck)
+response=$(curl -H "Authorization: ${access_token}" -X GET ${APIHost}oss/v1/buckets/${bucket}/details -k)
+#echo $response | python -m json.tool
+
+errorCode=$(echo $response | jsonValue errorCode 1)
+if [ "$errorCode" != "" ]; then
+	developerMessage=$(echo $response | jsonValue developerMessage 1)
+	echo "${errorCode} - ${developerMessage}"
+	exit
+fi
+key=$(echo $response | jsonValue key 1)
+if [ "$key" != "" ]; then
+	echo "Error - bucket already exists!"
+	#echo $response | python -m json.tool
+	exit
+fi
+
+response=$(curl --header "Content-Type: application/json" --header "Authorization: ${access_token}" --data "{\"bucketKey\":\"${bucket}\",\"policy\":\"${bucketType}\"}" ${APIHost}oss/v1/buckets -k)
+#echo $response | python -m json.tool
+key=$(echo $response | jsonValue key 1)
+echo "bucket ${bucket} created"
+echo $response > $ROOT/data/$key.bucket.json
+echo $bucket > $ROOT/data/bucket

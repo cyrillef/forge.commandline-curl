@@ -1,0 +1,64 @@
+#!/bin/bash
+
+[[ -f ./tools ]] && source ./tools
+[[ -f ./scripts/tools ]] && source ./scripts/tools
+source $ROOT/scripts/credentials
+
+master=$1
+id=$(cat $ROOT/data/${bucket}.${master}.json | jsonValueAtPath '["objects"][0]["id"]')
+id64=$(xbase64encode $id)
+
+# Generate local viewer
+echo -n '<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="https://developer.api.autodesk.com/viewingservice/v1/viewers/style.css" type="text/css">
+<script src="https://developer.api.autodesk.com/viewingservice/v1/viewers/viewer3D.min.js"></script>
+</head>
+<body onload="initialize()">
+  <div id="viewer" style="position:absolute; width:90%; height:90%;"></div>
+<script>
+function initialize () {
+  var options ={ "document" : "urn:' > $ROOT/temp/${master}.html
+echo -n $id64 >> $ROOT/temp/${master}.html
+echo '" } ;
+  var viewerElement =document.getElementById ("viewer") ;
+  var viewer =new Autodesk.Viewing.Viewer3D (viewerElement, {}) ;
+  viewer.initialize () ;
+  Autodesk.Viewing.Initializer (options, function () {
+   loadDocument (viewer, getURLParameterByName ("accessToken"), options.document) ;
+  }) ;
+}
+
+function getURLParameterByName (name) {
+    name =name.replace (/[\[]/, "\\[").replace (/[\]]/, "\\]") ;
+    var regex =new RegExp ("[\\?&]" + name + "=([^&#]*)") ;
+    results =regex.exec (location.search) ;
+    return (results == null ? "" : decodeURIComponent (results [1].replace (/\+/g, " "))) ;
+}
+
+function loadDocument (viewer, auth, documentId) {
+    // Find the first 3d geometry and load that.
+    Autodesk.Viewing.Document.load (documentId, auth,
+	  function (doc) { // onLoadCallback
+        var geometryItems =[] ;
+        geometryItems =Autodesk.Viewing.Document.getSubItemsWithProperties (doc.getRootItem (), { "type" : "geometry", "role" : "3d" }, true) ;
+        if ( geometryItems.length > 0 )
+          viewer.load (doc.getViewablePath (geometryItems [0])) ;
+      },
+	  function (errorMsg) { // onErrorCallback
+        alert("Load Error: " + errorMsg) ;
+      }) ;
+}
+</script>
+</body>
+</html>' >> $ROOT/temp/${master}.html
+
+cp -f $ROOT/temp/${master}.html $LocalhostFolder
+
+access_token=$(echo $access_token | sed 's/Bearer //')
+if [[ "${LocalhostFolder}" =~ "\\~.*" ]] || [[ "${LocalhostFolder}" =~ "/Users/${USER}/Sites" ]]; then
+	python -mwebbrowser "http://localhost/~${USER}/${master}.html?accessToken=${access_token}"
+else
+	python -mwebbrowser "http://localhost/${master}.html?accessToken=${access_token}"
+fi

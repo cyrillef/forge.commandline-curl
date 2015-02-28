@@ -1,0 +1,32 @@
+#!/bin/bash
+
+[[ -f ./tools ]] && source ./tools
+[[ -f ./scripts/tools ]] && source ./scripts/tools
+source $ROOT/scripts/credentials
+
+# Step 4: Upload a file
+
+if [ "$1" == "-h" ] || [ "$1" == "" ]; then
+	response=$(curl -k --header "Authorization: ${access_token}" ${APIHost}viewingservice/v1/supported)
+	echo $response | python -m json.tool
+	exit
+fi
+
+if [ ! -f $1 ]; then
+	echo "No such file: $1"
+	exit
+fi
+
+fullpath=$1
+filename=$(basename $fullpath)
+
+response=$(curl --header "Authorization: ${access_token}" -H "Content-Type:application/octet-stream" --header "Expect:" --upload-file "$fullpath" -X PUT ${APIHost}oss/v1/buckets/${bucket}/objects/${filename} -k)
+
+echo $response | python -m json.tool
+
+id=$(echo $response | jsonValueAtPath '["objects"][0]["id"]')
+echo "ID: $id"
+location=$(echo $response | jsonValueAtPath '["objects"][0]["location"]')
+echo "Location: $location"
+
+echo $response > $ROOT/data/${bucket}.${filename}.json

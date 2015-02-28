@@ -1,0 +1,18 @@
+#!/bin/bash
+
+[[ -f ./tools ]] && source ./tools
+[[ -f ./scripts/tools ]] && source ./scripts/tools
+source $ROOT/scripts/credentials
+
+master=$1
+id=$(cat $ROOT/data/${bucket}.${master}.json | jsonValueAtPath '["objects"][0]["id"]')
+id64=$(xbase64encode $id)
+
+# Get the thumnbail
+curl -H "Content-Type: application/json" -H "Authorization: ${access_token}" -X GET ${APIHost}viewingservice/v1/thumbnails/${id64} -k > $ROOT/temp/${master}.png
+
+if [ -f $ROOT/temp/${master}.png ] && [ -s $ROOT/temp/${master}.png ]; then
+	open $ROOT/temp/${master}.png
+else
+	echo "Error: Thumbnail not generated!"
+fi

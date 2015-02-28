@@ -1,0 +1,11 @@
+#!/bin/bash
+
+[[ -f ./tools ]] && source ./tools
+[[ -f ./scripts/tools ]] && source ./scripts/tools
+source $ROOT/scripts/credentials
+
+master=$1
+
+response=$(curl -H "Authorization: ${access_token}" -X GET ${APIHost}oss/v1/buckets/${bucket}/objects/${master}/details -k)
+echo $response | python -m json.tool
+#echo $response > ${bucket}.${master}.json

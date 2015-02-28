@@ -1,0 +1,20 @@
+#!/bin/bash
+
+[[ -f ./tools ]] && source ./tools
+[[ -f ./scripts/tools ]] && source ./scripts/tools
+source $ROOT/scripts/credentials
+
+master=$1
+id=$(cat $ROOT/data/${bucket}.${master}.json | jsonValueAtPath '["objects"][0]["id"]')
+id64=$(xbase64encode $id)
+
+# Step 6: Register Your Data with the Viewing Services
+
+response=$(curl -H "Content-Type: application/json" -H "Authorization: ${access_token}" -i -d "{\"urn\":\"${id64}\"}" ${APIHost}viewingservice/v1/register -k)
+#echo $response | tr -d '\015'
+if [[ $response == *"HTTP/1.1 200 OK"* ]]; then
+	echo "Registration successfully submitted."
+else
+	echo "Registration submission failed!"
+	echo $response | tr -d '\015'
+fi

@@ -1,0 +1,38 @@
+#!/bin/bash
+
+[[ -f ./tools ]] && source ./tools
+[[ -f ./scripts/tools ]] && source ./scripts/tools
+source $ROOT/scripts/credentials
+
+if [ "$1" != "" ]; then
+	bucket=$(bucketName $1)
+	if [[ $bucket == "" ]]; then
+		echo "Error: missing bucket name or invalid!"
+		exit
+	fi
+fi
+
+response=$(curl -H "Authorization: ${access_token}" -X GET ${APIHost}oss/v1/buckets/${bucket}/details -k)
+#echo $response | python -m json.tool
+
+errorCode=$(echo $response | jsonValue errorCode 1)
+if [ "$errorCode" != "" ]; then
+	developerMessage=$(echo $response | jsonValue developerMessage 1)
+	echo "${errorCode} - ${developerMessage}"
+	exit
+fi
+
+dtv=$(echo $response | jsonValue createDate 1)
+dt=$(date -r "$dtv")
+#echo "createDate = $dt"
+
+policyKey=$(echo $response | jsonValue policyKey 1)
+if [ "$policyKey" == "transient" ]; then # 24 hours
+	dt=$(date -r "$dtv" -v +1d)
+elif [ "$policyKey" == "temporary" ]; then # 30 days
+	dt=$(date -r "$dtv" -v +30d)
+else # persistent
+	echo "bucket will never expire"
+	exit
+fi
+echo "bucket will expire at: $dt"

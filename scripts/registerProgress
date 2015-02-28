@@ -1,0 +1,25 @@
+#!/bin/bash
+
+[[ -f ./tools ]] && source ./tools
+[[ -f ./scripts/tools ]] && source ./scripts/tools
+source $ROOT/scripts/credentials
+
+master=$1
+id=$(cat $ROOT/data/${bucket}.${master}.json | jsonValueAtPath '["objects"][0]["id"]')
+id64=$(xbase64encode $id)
+
+# Check on the registration progress
+response=$(curl -i -H "Content-Type: application/json" -H "Authorization: ${access_token}" -X GET ${APIHost}viewingservice/v1/${id64}/status -k)
+if [[ $response == *"HTTP/1.1 200 OK"* ]]; then
+	json=$(echo $response | tr -d '\015' | sed 's/.*keep-alive//')
+	status=$(echo $json | jsonValueAtPath '["status"]')
+	success=$(echo $json | jsonValueAtPath '["success"]')
+	echo "Request: ${status} - ${success}"
+else
+	echo "Request failed!"
+	echo $response | tr -d '\015'
+fi
+
+#echo $response | tr -d '\015' | sed 's/.*keep-alive//' | python -m json.tool
+#echo $response > test.txt
+#echo $response | tr -d '\015' | sed 's/.*keep-alive//'

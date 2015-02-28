@@ -1,0 +1,85 @@
+#!/bin/bash
+
+ROOT="`dirname \"$0\"`" # Relative
+export ROOT="`( cd \"$ROOT\" && pwd )`" # Absolutized and normalized
+[[ -f ./scripts/tools ]] && source ./scripts/tools
+
+function usage () {
+	echo '
+  viewerAPI command [arg]
+
+    auth           - get an access token (no argument)
+    buckets        - list buckets
+    bucket [<Name>]
+                   - set or get the current bucket
+    bucketCreate <Name> [<Type>]
+                   - create a new bucket,
+                     default Type is transient, values can be
+                     transient/temporary/permanent
+    bucketCheck [<Name>]
+                   - check bucket validity, outputs the expiration
+                     date/time for this bucket
+    upload [-h] <File>
+                   - upload a file in the current bucket
+                     -h for list of supported format
+    objectDetails <FileKey>
+                   - file information
+    register <FileKey>
+                   - translate the file for viewing
+    registerProgress <FileKey>
+                   - file translation progress
+    viewable <FileKey> [<subCommand>]
+                   - get viewable information
+                     subcommand: nothing - all - all?guid= - status - status?guid=
+    thumbnail <FileKey>
+                   - get thumbnail
+    html <FileKey>
+                   - generate default html page and view in browser
+    setReferences <FileKeyMaster> <FileIdChild> [<FileIdChild>...]
+                   - set file references
+    setReferencesUsingBuckets <FileKeyMaster>
+                   - set file references
+	'
+}
+
+case "$1" in
+	"help" | "usage" | "-h" | "")
+		usage
+		exit
+		;;
+	"auth")
+		source $ROOT/scripts/auth
+		;;
+	"bucket")
+		if [ "$2" == "" ]; then
+			echo -n "Current bucket is: "
+			cat $ROOT/data/bucket
+			exit
+		fi
+		bucket=$(bucketName $2)
+		if [ "$bucket" != "" ]; then
+			echo $bucket > $ROOT/data/bucket
+		else
+			echo "Error: missing bucket name or invalid!"
+			exit
+		fi
+		;;
+	"buckets")
+		regex="(.*)\.bucket\.json"
+		ll=$(ls $ROOT/data/*.bucket.json)
+		for l in $ll; do
+			lb=$(basename $l)
+			[[ $lb =~ $regex ]]
+			name="${BASH_REMATCH[1]}"
+			echo $name
+        done
+		;;
+	# "bucketCreate") "bucketCheck") "upload") "objectDetails")
+	# "register") "registerProgress") "viewable") "thumbnail")
+	# "html") "setReferences") "setReferencesUsingBuckets")
+	*)
+		cmd=$1
+		shift
+		$ROOT/scripts/${cmd} "$@"
+		;;
+esac
