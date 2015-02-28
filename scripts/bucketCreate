@@ -5,9 +5,6 @@
 source $ROOT/scripts/credentials
 
 # Step 3: Create a bucket
-
-#echo bucket input: $1
-
 bucket=$(bucketName $1)
 
 if [[ $bucket == "" ]]; then
@@ -41,6 +38,11 @@ fi
 response=$(curl --header "Content-Type: application/json" --header "Authorization: ${access_token}" --data "{\"bucketKey\":\"${bucket}\",\"policy\":\"${bucketType}\"}" ${APIHost}oss/v1/buckets -k)
 #echo $response | python -m json.tool
 key=$(echo $response | jsonValue key 1)
-echo "bucket ${bucket} created"
+if [ "$key" == "" ]; then
+	key=$(echo $response | jsonValue reason 1)
+	echo "Error - ${key}"
+	exit
+fi
+echo "bucket ${key} created"
 echo $response > $ROOT/data/$key.bucket.json
 echo $bucket > $ROOT/data/bucket

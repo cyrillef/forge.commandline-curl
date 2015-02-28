@@ -13,8 +13,13 @@ response=$(curl -i -H "Content-Type: application/json" -H "Authorization: ${acce
 if [[ $response == *"HTTP/1.1 200 OK"* ]]; then
 	json=$(echo $response | tr -d '\015' | sed 's/.*keep-alive//')
 	status=$(echo $json | jsonValueAtPath '["status"]')
+	progress=$(echo $json | jsonValueAtPath '["progress"]')
+	if [ $status == "success" ]; then
 	success=$(echo $json | jsonValueAtPath '["success"]')
-	echo "Request: ${status} - ${success}"
+	else
+		success=""
+	fi
+	echo "Request: ${status} (${progress}) - ${success}"
 else
 	echo "Request failed!"
 	echo $response | tr -d '\015'
