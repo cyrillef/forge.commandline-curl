@@ -13,6 +13,13 @@ response=$(curl --data "client_id=${ConsumerKey}&client_secret=${ConsumerSecret}
 #echo $response | python -m json.tool
 
 token_type=$(echo $response | jsonValue token_type 1)
+if [ "$token_type" == "" ]; then
+	msg=$(echo $response | jsonValue "faultstring" 1)
+	echo "Failed to get your token"
+	echo "  $msg"
+	[[ -f $ROOT/data/access_token ]] && rm $ROOT/data/access_token
+	exit
+fi
 access_token=$(echo $response | jsonValue access_token 1)
 expires_in=$(echo $response | jsonValue expires_in 1)
 dt=$(date -v "+${expires_in}S")
