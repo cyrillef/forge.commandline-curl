@@ -51,26 +51,26 @@ The ./viewerAPI scripts provide quick help information for the commands and argu
 
 A typical workflow is:
 
-    # Do authentication <br />
+    # Do authentication 
     ./viewerAPI auth
 
     # Create a bucket. Bucket name must be lower case and valid characters <br />
     ./viewerAPI bucketCreate my_bucket_name
 
-    # Upload a model <br />
+    # Upload a model 
     ./viewerAPI upload samples/Au.obj
 
-    # Register the model to get it translated <br />
+    # Register the model to get it translated 
     ./viewerAPI register Au.obj
 
     # Wait until the translation completes.
-    # Translation is complete when it reaches 'success - 100%' <br />
+    # Translation is complete when it reaches 'success - 100%' 
     ./viewerAPI registerProgress Au.obj
 
-    # Retrieve preview image (png saved into ./temp/) <br />
+    # Retrieve preview image (png saved into ./temp/) 
     ./viewerAPI thumbnail Au.obj
 
-    # View the model in your localhost WEB site (html saved into ./temp/ and posted to your localhost) <br />
+    # View the model in your localhost WEB site (html saved into ./temp/ and posted to your localhost) 
     sudo ./viewerAPI html Au.obj
 
 Note your access token and bucket name are saved in the data folder to be used as default by the scripts, but you can edit them as you wish.
