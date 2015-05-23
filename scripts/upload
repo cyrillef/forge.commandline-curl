@@ -4,12 +4,39 @@
 [[ -f ./scripts/tools ]] && source ./scripts/tools
 source $ROOT/scripts/credentials
 
+function responseList () {
+    local KEY=$1
+    shift
+	echo $* | python -c '
+import json, sys
+obj =json.load (sys.stdin)
+keys =obj ["channelMapping"].keys ()
+keys.sort ()
+for x in keys:
+  if obj ["channelMapping"] [x].startswith (u"'${KEY}'"):
+    print x,
+'
+}
+
 # Step 4: Upload a file
 
 if [ "$1" == "-h" ] || [ "$1" == "" ]; then
 	response=$(curl -k --header "Authorization: ${access_token}" ${APIHost}viewingservice/v1/supported)
-	echo $response | python -m json.tool
-	exit
+    errorCode=$(echo $response | jsonValue errorCode 1)
+    if [ "$errorCode" != "" ]; then
+	   developerMessage=$(echo $response | jsonValue developerMessage 1)
+	   echo "${errorCode} - ${developerMessage}"
+	   exit
+    fi
+    
+	#echo $response | python -m json.tool
+    echo "Viewables"
+    responseList 'viewing' <<< echo $response
+    echo ""
+    echo "Data"
+    responseList 'extraction' <<< echo $response
+    echo ""
+    exit
 fi
 
 if [ ! -f $1 ]; then
