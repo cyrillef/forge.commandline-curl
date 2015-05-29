@@ -107,7 +107,7 @@ Starting Mountain Lion, there is an Apache WEB server pre-installed on Mac OS X,
    ```
    <br />This will start the Apache WEB server.
 3. To make sure that it is working, open a browser and type `http://localhost` in the address bar.
-   If you see a “It works!” message, then your Apache server is running fine.
+   If you see a message saying, “It works!”, your Apache server is running fine.
 
 
 ### Linux
