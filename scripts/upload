@@ -39,15 +39,17 @@ if [ "$1" == "-h" ] || [ "$1" == "" ]; then
     exit
 fi
 
-if [ ! -f $1 ]; then
+if [ ! -f "$1" ]; then
 	echo "No such file: $1"
 	exit
 fi
 
 fullpath=$1
 filename=$(basename $fullpath)
+echo $filename
+exit
 
-response=$(curl --header "Authorization: ${access_token}" -H "Content-Type:application/octet-stream" --header "Expect:" --upload-file "$fullpath" -X PUT ${APIHost}oss/v1/buckets/${bucket}/objects/${filename} -k)
+response=$(curl --header "Authorization: ${access_token}" -H "Content-Type:application/octet-stream" --header "Expect:" --upload-file "$fullpath" -X PUT "${APIHost}oss/v1/buckets/${bucket}/objects/${filename}" -k)
 
 echo $response | python -m json.tool
 
@@ -56,4 +58,4 @@ echo "ID: $id"
 location=$(echo $response | jsonValueAtPath '["objects"][0]["location"]')
 echo "Location: $location"
 
-echo $response > $ROOT/data/${bucket}.${filename}.json
+echo $response > "$ROOT/data/${bucket}.${filename}.json"
