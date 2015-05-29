@@ -33,7 +33,8 @@ This sample targets Unix only, it should run on different distribution of Linux 
 
 ## Setup/Usage Instructions
 
-  1. Make sure curl is installed in your system, if it is not, please refer to these [cURL releases and downloads](http://curl.haxx.se/download.html).
+  1. Make sure curl is installed in your system; if not, please refer to the
+     [cURL releases and downloads](http://curl.haxx.se/download.html).
   2. Check that cURL is running in a Terminal window:<br />
      ```
      curl -V
