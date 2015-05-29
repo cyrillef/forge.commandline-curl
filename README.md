@@ -1,5 +1,4 @@
-workflow-curl-view.and.data.api
-===============================
+# workflow-curl-view.and.data.api
 
 Demonstrates the Autodesk View and Data API authorisation and translation process using cURL in command line scripts.
 
@@ -34,43 +33,44 @@ This sample targets Unix only, it should run on different distribution of Linux 
 
 ## Setup/Usage Instructions
 
-  1. Make sure curl is installed in your system, if it is not, please refer to [here](http://curl.haxx.se/download.html)
-     Check on Terminal if curl is installed<br />
+  1. Make sure curl is installed in your system; if not, please refer to the
+     [cURL releases and downloads](http://curl.haxx.se/download.html).
+  2. Check that cURL is running in a Terminal window:<br />
      ```
      curl -V
      ```
-  2. Request your consumer key/secret key from [https://developer.autodesk.com](https://developer.autodesk.com)
-  3. Copy or rename the ./scripts/credentials_ file into ./scripts/credentials<br />
+  3. Request your consumer key/secret key from [https://developer.autodesk.com](https://developer.autodesk.com).
+  4. Copy or rename the ./scripts/credentials_ file into ./scripts/credentials:<br />
      ```
      cp ./scripts/credentials_ ./scripts/credentials
      ```
-  4. Copy your keys into the ./scripts/credentials file
-  5. Optionally, setup your WEB server - See instructions in the 'Local WEB server' section
+  5. Copy your keys into the ./scripts/credentials file.
+  6. Optionally, setup your WEB server - see instructions below in the 'Local WEB server' section.
 
 The ./viewerAPI scripts provide quick help information for the commands and arguments.
 
 A typical workflow is:
 
-    # Do authentication 
+    # Do authentication
     ./viewerAPI auth
 
     # Create a bucket. Bucket name must be lower case and valid characters <br />
     ./viewerAPI bucketCreate my_bucket_name
 
-    # Upload a model 
+    # Upload a model
     ./viewerAPI upload samples/Au.obj
 
-    # Register the model to get it translated 
+    # Register the model to get it translated
     ./viewerAPI register Au.obj
 
     # Wait until the translation completes.
-    # Translation is complete when it reaches 'success - 100%' 
+    # Translation is complete when it reaches 'success - 100%'
     ./viewerAPI registerProgress Au.obj
 
-    # Retrieve preview image (png saved into ./temp/) 
+    # Retrieve preview image (png saved into ./temp/)
     ./viewerAPI thumbnail Au.obj
 
-    # View the model in your localhost WEB site (html saved into ./temp/ and posted to your localhost) 
+    # View the model in your localhost WEB site (html saved into ./temp/ and posted to your localhost)
     sudo ./viewerAPI html Au.obj
 
 Note your access token and bucket name are saved in the data folder to be used as default by the scripts, but you can edit them as you wish.
@@ -106,7 +106,8 @@ Starting Mountain Lion, there is an Apache WEB server pre-installed on Mac OS X,
    sudo apachectl start
    ```
    <br />This will start the Apache WEB server.
-3. To make sure that it is working, open a browser and type “http://localhost” in the address bar. If you see a “It works!” message, then your Apache server is running fine.
+3. To make sure that it is working, open a browser and type `http://localhost` in the address bar.
+   If you see a message saying, “It works!”, your Apache server is running fine.
 
 
 ### Linux
@@ -122,6 +123,6 @@ workflow-curl-view.and.data.api is licensed under the terms of the [MIT License]
 ## Written by
 
 Cyrille Fauvel, Autodesk Inc. <br />
-Autodesk Developer Network <br /> 
+Autodesk Developer Network <br />
 http://www.autodesk.com/adn <br />
-http://around-the-corner.typepad.com/ <br />
+http://around-the-corner.typepad.com <br />
