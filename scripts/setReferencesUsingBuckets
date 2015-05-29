@@ -6,20 +6,23 @@ source $ROOT/scripts/credentials
 
 # Step 5: Setup References between multiple files
 master=$1
-ll=$(ls $ROOT/data/${bucket}.*.json)
+masterUri=`echo $master | sed 's/ /+/g'`
+masterHdd=`echo $masterUri | sed 's/+/ /g'`
+
+ll=$(ls "$ROOT/data/${bucket}.*.json")
 for f in $ll; do
-	if [ $f != "$ROOT/data/${bucket}.${master}.json" ]; then
+	if [ $f != "$ROOT/data/${bucket}.${masterHdd}.json" ]; then
 		continue
 	fi
-	id=$(cat $f | jsonValueAtPath '["objects"][0]["id"]')
+	id=$(cat "$f" | jsonValueAtPath '["objects"][0]["id"]')
 	parentPath=$(basename $id)
 	st="{ \"master\" : \"${id}\", \"dependencies\" : ["
 done
 for f in $ll; do
-	if [ $f == "$ROOT/data/${bucket}.bucket.json" ] || [ $f == "$ROOT/data/${bucket}.${master}.json" ]; then
+	if [ $f == "$ROOT/data/${bucket}.bucket.json" ] || [ $f == "$ROOT/data/${bucket}.${masterHdd}.json" ]; then
 		continue
 	fi
-	id=$(cat $f | jsonValueAtPath '["objects"][0]["id"]')
+	id=$(cat "$f" | jsonValueAtPath '["objects"][0]["id"]')
 	childPath=$(basename $id)
 	st=$st"{ \"file\" : \"${id}\", \"metadata\" : { \"childPath\" : \"${childPath}\", \"parentPath\" : \"$parentPath\" } },"
 done

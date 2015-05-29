@@ -5,7 +5,10 @@
 source $ROOT/scripts/credentials
 
 master=$1
-id=$(cat $ROOT/data/${bucket}.${master}.json | jsonValueAtPath '["objects"][0]["id"]')
+masterUri=`echo $master | sed 's/ /+/g'`
+masterHdd=`echo $masterUri | sed 's/+/ /g'`
+
+id=$(cat "$ROOT/data/${bucket}.${masterHdd}.json" | jsonValueAtPath '["objects"][0]["id"]')
 id64=$(xbase64encode $id)
 
 # Generate local viewer
@@ -19,8 +22,8 @@ echo -n '<!DOCTYPE html>
   <div id="viewer" style="position:absolute; width:90%; height:90%;"></div>
 <script>
 function initialize () {
-  var options ={ "document" : "urn:' > $ROOT/temp/${master}.html
-echo -n $id64 >> $ROOT/temp/${master}.html
+  var options ={ "document" : "urn:' > "$ROOT/temp/${masterHdd}.html"
+echo -n $id64 >> "$ROOT/temp/${masterHdd}.html"
 echo '" } ;
   var viewerElement =document.getElementById ("viewer") ;
   var viewer =new Autodesk.Viewing.Viewer3D (viewerElement, {}) ;
@@ -52,13 +55,13 @@ function loadDocument (viewer, auth, documentId) {
 }
 </script>
 </body>
-</html>' >> $ROOT/temp/${master}.html
+</html>' >> "$ROOT/temp/${masterHdd}.html"
 
-cp -f $ROOT/temp/${master}.html $LocalhostFolder
+cp -f "$ROOT/temp/${masterHdd}.html" $LocalhostFolder
 
 access_token=$(echo $access_token | sed 's/Bearer //')
 if [[ "${LocalhostFolder}" =~ "\\~.*" ]] || [[ "${LocalhostFolder}" =~ "/Users/${USER}/Sites" ]]; then
-	python -mwebbrowser "http://localhost/~${USER}/${master}.html?accessToken=${access_token}"
+	python -mwebbrowser "http://localhost/~${USER}/${masterUri}.html?accessToken=${access_token}"
 else
-	python -mwebbrowser "http://localhost/${master}.html?accessToken=${access_token}"
+	python -mwebbrowser "http://localhost/${masterUri}.html?accessToken=${access_token}"
 fi

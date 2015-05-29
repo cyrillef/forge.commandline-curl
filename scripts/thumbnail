@@ -5,14 +5,22 @@
 source $ROOT/scripts/credentials
 
 master=$1
-id=$(cat $ROOT/data/${bucket}.${master}.json | jsonValueAtPath '["objects"][0]["id"]')
+masterUri=`echo $master | sed 's/ /+/g'`
+masterHdd=`echo $masterUri | sed 's/+/ /g'`
+
+id=$(cat "$ROOT/data/${bucket}.${masterHdd}.json" | jsonValueAtPath '["objects"][0]["id"]')
 id64=$(xbase64encode $id)
 
 # Get the thumnbail
-curl -H "Content-Type: application/json" -H "Authorization: ${access_token}" -X GET ${APIHost}viewingservice/v1/thumbnails/${id64} -k > $ROOT/temp/${master}.png
+curl -H "Content-Type: application/json" -H "Authorization: ${access_token}" -X GET ${APIHost}viewingservice/v1/thumbnails/${id64} -k > "$ROOT/temp/${masterHdd}.png"
 
-if [ -f $ROOT/temp/${master}.png ] && [ -s $ROOT/temp/${master}.png ]; then
-	open $ROOT/temp/${master}.png
+if [ -f "$ROOT/temp/${masterHdd}.png" ] && [ -s "$ROOT/temp/${masterHdd}.png" ]; then
+    test=`file "$ROOT/temp/${masterHdd}.png" | grep "PNG image data"`
+    if [ "$test" != "" ]; then
+        open "$ROOT/temp/${masterHdd}.png"
+    else
+        echo "Error: Not a PNG file or corrupted PNG! Maybe the thumbnail is not yet ready, try again later."
+    fi
 else
 	echo "Error: Thumbnail not generated!"
 fi

@@ -5,7 +5,10 @@
 source $ROOT/scripts/credentials
 
 master=$1
-id=$(cat $ROOT/data/${bucket}.${master}.json | jsonValueAtPath '["objects"][0]["id"]')
+masterUri=`echo $master | sed 's/ /+/g'`
+masterHdd=`echo $masterUri | sed 's/+/ /g'`
+
+id=$(cat "$ROOT/data/${bucket}.${masterHdd}.json" | jsonValueAtPath '["objects"][0]["id"]')
 id64=$(xbase64encode $id)
 
 # Step 6: Register Your Data with the Viewing Services
