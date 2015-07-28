@@ -5,8 +5,11 @@
 source $ROOT/scripts/credentials
 
 master=$1
+masterUri=`echo $master | sed 's/ /+/g'`
+masterHdd=`echo $masterUri | sed 's/+/ /g'`
+
 command=$2 # nothing - all - all?guid= - status - status?guid=
-id=$(cat $ROOT/data/${bucket}.${master}.json | jsonValueAtPath '["objects"][0]["id"]')
+id=$(cat "$ROOT/data/${bucket}.${masterHdd}.json" | jsonValueAtPath '["objects"][0]["id"]')
 id64=$(xbase64encode $id)
 
 # Get viewables

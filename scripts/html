@@ -15,20 +15,22 @@ id64=$(xbase64encode $id)
 echo -n '<!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" href="https://developer.api.autodesk.com/viewingservice/v1/viewers/style.css" type="text/css">
-<script src="https://developer.api.autodesk.com/viewingservice/v1/viewers/viewer3D.min.js"></script>
+<meta charset="UTF-8">
+<link type="text/css" rel="stylesheet" href="https://developer.api.autodesk.com/viewingservice/v1/viewers/style.css">
+<script src="https://developer.api.autodesk.com/viewingservice/v1/viewers/viewer3D.js"></script>
 </head>
 <body onload="initialize()">
   <div id="viewer" style="position:absolute; width:90%; height:90%;"></div>
 <script>
 function initialize () {
-  var options ={ "document" : "urn:' > "$ROOT/temp/${masterHdd}.html"
-echo -n $id64 >> "$ROOT/temp/${masterHdd}.html"
+  var options ={ "document" : "urn:' > "$ROOT/temp/${masterUri}.html"
+echo -n $id64 >> "$ROOT/temp/${masterUri}.html"
 echo '" } ;
   var viewerElement =document.getElementById ("viewer") ;
-  var viewer =new Autodesk.Viewing.Viewer3D (viewerElement, {}) ;
-  viewer.initialize () ;
+  //var viewer =new Autodesk.Viewing.Viewer3D (viewerElement, {}) ; / No toolbar
+  var viewer =new Autodesk.Viewing.Private.GuiViewer3D (viewerElement, {}) ; // With toolbar
   Autodesk.Viewing.Initializer (options, function () {
+   viewer.initialize () ;
    loadDocument (viewer, getURLParameterByName ("accessToken"), options.document) ;
   }) ;
 }
@@ -55,9 +57,9 @@ function loadDocument (viewer, auth, documentId) {
 }
 </script>
 </body>
-</html>' >> "$ROOT/temp/${masterHdd}.html"
+</html>' >> "$ROOT/temp/${masterUri}.html"
 
-cp -f "$ROOT/temp/${masterHdd}.html" $LocalhostFolder
+cp -f "$ROOT/temp/${masterUri}.html" $LocalhostFolder
 
 access_token=$(echo $access_token | sed 's/Bearer //')
 if [[ "${LocalhostFolder}" =~ "\\~.*" ]] || [[ "${LocalhostFolder}" =~ "/Users/${USER}/Sites" ]]; then
