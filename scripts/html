@@ -17,7 +17,7 @@ echo -n '<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <link type="text/css" rel="stylesheet" href="https://developer.api.autodesk.com/viewingservice/v1/viewers/style.css">
-<script src="https://developer.api.autodesk.com/viewingservice/v1/viewers/viewer3D.js"></script>
+<script src="https://developer.api.autodesk.com/viewingservice/v1/viewers/viewer3D.min.js"></script>
 </head>
 <body onload="initialize()">
   <div id="viewer" style="position:absolute; width:90%; height:90%;"></div>
