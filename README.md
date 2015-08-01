@@ -25,13 +25,17 @@ That would presumably help developers debugging their processes quickly. Probabl
 
 ## Dependencies
 
-Standard OS functionality and cURL.
+Standard OS functionality, Bash, cURL and Python.
 
 * http://en.wikipedia.org/wiki/CURL
+* https://en.wikipedia.org/wiki/Bash_(Unix_shell)
+* https://en.wikipedia.org/wiki/Python_(programming_language)
 
-This sample targets Unix only, it should run on different distribution of Linux and Mac OSX as well. For windows user, you need to install a unix shell like [cygwin](http://cygwin.com).
+This sample targets Mac OSX and Unix only, it should run on different distribution of Linux but was tested on Ubuntu and Fedora only at this time. Windows user, you need to install a unix shell like [cygwin](http://cygwin.com), but the sample requires bash 3.2 minimum to run. See the Windows special setup instructions for more details.
 
 ## Setup/Usage Instructions
+
+Windows user, see  Windows special setup instructions below first.
 
   1. Make sure curl is installed in your system; if not, please refer to the
      [cURL releases and downloads](http://curl.haxx.se/download.html).
@@ -76,6 +80,20 @@ A typical workflow is:
 Note your access token and bucket name are saved in the data folder to be used as default by the scripts, but you can edit them as you wish.
 
 Bucket information (JSON replies) returned by the system is stored in the data folder as well.
+
+
+### Windows special setup instructions
+
+This sample was tested on Windows with the [git for windows](http://git-for-windows.github.io/) package. It provides a nice terminal windows running Bash v4.3 and cUrl v7.43 already installed.
+
+  1. Go to [http://git-for-windows.github.io/](http://git-for-windows.github.io/) and install the package.
+     Select teh default options.
+  2. Go to [https://www.python.org/](https://www.python.org/), and install Python v2.7 or later.
+  3. Start the 'Git Bash' Terminal window from the Desktop icon, or a shortcut running this command
+     ``` "C:\Program Files\Git\git-bash.exe" --cd-to-home ```
+  4. Add the Python exe path to the system path by running this command
+     ``` export PATH=$PATH:/c/Python ```
+  5. You can now continue with the instructions above.
 
 
 ## Sample Log of Complete Process
