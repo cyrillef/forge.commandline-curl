@@ -133,6 +133,21 @@ Starting Mountain Lion, there is an Apache WEB server pre-installed on Mac OS X,
 You need to install a WEB server, apache for instance, the way to install and run apache may be different according to the distribution you are using.
 
 
+### All platforms using Node/http-server (including Windows)
+
+On all platform you may install the Node.js http-server utility. http-server is a simple, zero-configuration command-line http server. It is powerful enough for production usage, but it's simple and hackable enough to be used for testing, local development, and learning.
+
+  1. Install node from [https://nodejs.org/](https://nodejs.org/)
+  2. To install http-server, go on your Node.js console and enter the following command:
+     ```npm install http-server -g```
+  3. Start the http-server from the Node.js console
+     ```
+     cd <my sample directory>
+     http-server [path] [options]
+     ```
+     [path] defaults to ./public if the folder exists, and ./ otherwise.
+
+
 ## License
 
 workflow-curl-view.and.data.api is licensed under the terms of the [MIT License](http://opensource.org/licenses/MIT). Please see the [LICENSE](LICENSE) file for full details.
