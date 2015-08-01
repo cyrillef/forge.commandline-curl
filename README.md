@@ -89,7 +89,7 @@ Bucket information (JSON replies) returned by the system is stored in the data f
 This sample was tested on Windows with the [git for windows](http://git-for-windows.github.io/) package. It provides a nice terminal windows running Bash v4.3 and cUrl v7.43 already installed.
 
   1. Go to [http://git-for-windows.github.io/](http://git-for-windows.github.io/) and install the package.
-     Select teh default options.
+     Select the default options.
   2. Go to [https://www.python.org/](https://www.python.org/), and install Python v2.7 or later.
   3. Start the 'Git Bash' Terminal window from the Desktop icon, or a shortcut running this command
      ``` "C:\Program Files\Git\git-bash.exe" --cd-to-home ```
