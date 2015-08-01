@@ -145,7 +145,8 @@ On all platform you may install the Node.js http-server utility. http-server is 
      cd <my sample directory>
      
      http-server [path] [options]
-     ``` <br />
+     ``` 
+     
      [path] defaults to ./public if the folder exists, and ./ otherwise.
 
 
