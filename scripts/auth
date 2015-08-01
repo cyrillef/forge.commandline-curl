@@ -22,7 +22,11 @@ if [ "$token_type" == "" ]; then
 fi
 access_token=$(echo $response | jsonValue access_token 1)
 expires_in=$(echo $response | jsonValue expires_in 1)
-dt=$(date -v "+${expires_in}S")
+if [ "$OS" == "Windows_NT" ]; then
+	dt=$(date -d "+${expires_in} seconds")
+else
+	dt=$(date -v "+${expires_in}S")
+fi
 
 echo "Your new access token is: ${token_type} ${access_token}"
 echo "Expires at $dt"

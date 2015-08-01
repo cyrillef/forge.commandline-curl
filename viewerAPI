@@ -39,7 +39,9 @@ function usage () {
                    - set file references
     setReferencesUsingBuckets <FileKeyMaster>
                    - set file references
-	'
+    delete <FileKey>
+                   - delete viewable/bubbles from server
+'
 }
 
 case "$1" in

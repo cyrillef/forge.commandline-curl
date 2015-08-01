@@ -26,6 +26,7 @@ for f in "$@"; do
 done
 st="${st%?}] }"
 #echo $st | python -m json.tool
+#exit 0
 
 #echo $st > test.txt
 #response=$(curl -H "Content-Type: application/json" -H "Authorization: ${access_token}" -i -d @test.txt ${APIHost}references/v1/setreference -k)

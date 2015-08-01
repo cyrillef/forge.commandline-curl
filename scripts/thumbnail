@@ -17,7 +17,11 @@ curl -H "Content-Type: application/json" -H "Authorization: ${access_token}" -X 
 if [ -f "$ROOT/temp/${masterHdd}.png" ] && [ -s "$ROOT/temp/${masterHdd}.png" ]; then
     test=`file "$ROOT/temp/${masterHdd}.png" | grep "PNG image data"`
     if [ "$test" != "" ]; then
-        open "$ROOT/temp/${masterHdd}.png"
+		if [ "$OS" == "Windows_NT" ]; then
+			echo "Your preview file is stored in '$ROOT/temp/${masterHdd}.png'"
+		else
+			open "$ROOT/temp/${masterHdd}.png"
+		fi
     else
         echo "Error: Not a PNG file or corrupted PNG! Maybe the thumbnail is not yet ready, try again later."
     fi

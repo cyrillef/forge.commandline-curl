@@ -1,0 +1,15 @@
+#!/bin/bash
+
+[[ -f ./tools ]] && source ./tools
+[[ -f ./scripts/tools ]] && source ./scripts/tools
+source $ROOT/scripts/credentials
+
+master=$1
+masterUri=`echo $master | sed 's/ /+/g'`
+masterHdd=`echo $masterUri | sed 's/+/ /g'`
+
+id=$(cat "$ROOT/data/${bucket}.${masterHdd}.json" | jsonValueAtPath '["objects"][0]["id"]')
+id64=$(xbase64encode $id)
+
+response=$(curl -i -H "Content-Type: application/json" -H "Authorization: ${access_token}" -X DELETE ${APIHost}viewingservice/v1/${id64} -k)
+echo $response
