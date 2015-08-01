@@ -52,6 +52,7 @@ Windows user, see  Windows special setup instructions below first.
   6. Optionally, setup your WEB server - see instructions below in the 'Local WEB server' section.
      * Specify in credentials.js in variable 'LocalhostFolder' where your html files should be copied into,
        for your WEB server to find them. This would be required for using command 'html'.
+     * Specify in credentials.js in variable 'LocalServerPort' which port to use for your local WEB server.
 
 The ./viewerAPI scripts provide quick help information for the commands and arguments.
 
@@ -116,6 +117,8 @@ Here is a copy of the log file from a successful real-world execution run on Mac
 
 ## Local WEB server
 
+This sample assumes using port 80. If you want another port make sure to specify the port number in credentials.js.
+
 ### Mac OSX
 
 Starting Mountain Lion, there is an Apache WEB server pre-installed on Mac OS X, so there is no need to install it. However, you need to start the Apache WEB server, using a Terminal window.
@@ -149,7 +152,8 @@ On all platform you may install the Node.js http-server utility. http-server is 
      http-server [path] [options]
      ``` 
      
-     [path] defaults to ./public if the folder exists, and ./ otherwise.
+     [path] defaults to ./public if the folder exists, and ./ otherwise. <br />
+     use -p option to specify the port you want. Default is port 8080.
 
 
 ## License
