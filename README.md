@@ -138,13 +138,14 @@ You need to install a WEB server, apache for instance, the way to install and ru
 On all platform you may install the Node.js http-server utility. http-server is a simple, zero-configuration command-line http server. It is powerful enough for production usage, but it's simple and hackable enough to be used for testing, local development, and learning.
 
   1. Install node from [https://nodejs.org/](https://nodejs.org/)
-  2. To install http-server, go on your Node.js console and enter the following command:
+  2. To install http-server, go on your Node.js console and enter the following command: <br />
      ```npm install http-server -g```
-  3. Start the http-server from the Node.js console
+  3. Start the http-server from the Node.js console <br />
      ```
      cd <my sample directory>
+     
      http-server [path] [options]
-     ```
+     ``` <br />
      [path] defaults to ./public if the folder exists, and ./ otherwise.
 
 
