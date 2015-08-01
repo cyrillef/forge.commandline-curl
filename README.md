@@ -50,6 +50,8 @@ Windows user, see  Windows special setup instructions below first.
      ```
   5. Copy your keys into the ./scripts/credentials file.
   6. Optionally, setup your WEB server - see instructions below in the 'Local WEB server' section.
+     * Specify in credentials.js in variable 'LocalhostFolder' where your html files should be copied into,
+       for your WEB server to find them. This would be required for using command 'html'.
 
 The ./viewerAPI scripts provide quick help information for the commands and arguments.
 
