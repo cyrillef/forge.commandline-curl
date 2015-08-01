@@ -63,7 +63,7 @@ cp -f "$ROOT/temp/${masterUri}.html" $LocalhostFolder
 
 access_token=$(echo $access_token | sed 's/Bearer //')
 if [[ "${LocalhostFolder}" =~ "\\~.*" ]] || [[ "${LocalhostFolder}" =~ "/Users/${USER}/Sites" ]]; then
-	python -mwebbrowser "http://localhost/~${USER}/${masterUri}.html?accessToken=${access_token}"
+	python -mwebbrowser "http://localhost:${LocalServerPort}/~${USER}/${masterUri}.html?accessToken=${access_token}"
 else
-	python -mwebbrowser "http://localhost/${masterUri}.html?accessToken=${access_token}"
+	python -mwebbrowser "http://localhost:${LocalServerPort}/${masterUri}.html?accessToken=${access_token}"
 fi
