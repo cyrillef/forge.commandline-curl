@@ -31,7 +31,7 @@ Standard OS functionality, Bash, cURL and Python.
 * https://en.wikipedia.org/wiki/Bash_(Unix_shell)
 * https://en.wikipedia.org/wiki/Python_(programming_language)
 
-This sample targets Mac OSX and Unix only, it should run on different distribution of Linux but was tested on Ubuntu and Fedora only at this time. Windows user, you need to install a unix shell like [cygwin](http://cygwin.com), but the sample requires bash 3.2 minimum to run. See the Windows special setup instructions for more details.
+This sample targets Mac OSX and Unix only, it should run on different distribution of Linux but was tested on Ubuntu and Fedora only at this time. Windows user, you need to install a Unix shell like [cygwin](http://cygwin.com), but the sample requires bash 3.2 minimum to run. See the Windows special setup instructions for more details.
 
 ## Setup/Usage Instructions
 
@@ -61,7 +61,7 @@ A typical workflow is:
     # Do authentication
     ./viewerAPI auth
 
-    # Create a bucket. Bucket name must be lower case and valid characters <br />
+    # Create a bucket. Bucket name must be lower case and valid characters
     ./viewerAPI bucketCreate my_bucket_name
 
     # Upload a model
@@ -148,10 +148,10 @@ On all platform you may install the Node.js http-server utility. http-server is 
   3. Start the http-server from the Node.js console <br />
      ```
      cd <my sample directory>
-     
+
      http-server [path] [options]
-     ``` 
-     
+     ```
+
      [path] defaults to ./public if the folder exists, and ./ otherwise. <br />
      use -p option to specify the port you want. Default is port 8080.
 
