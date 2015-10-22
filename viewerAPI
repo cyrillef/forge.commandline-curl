@@ -39,8 +39,10 @@ function usage () {
                    - set file references
     setReferencesUsingBuckets <FileKeyMaster>
                    - set file references
-    delete <FileKey>
-                   - delete viewable/bubbles from server
+    deleteViewables <FileKey>
+                   - delete viewable/bubbles from server (after translation)
+    deleteFile <FileKey>
+                   - delete the source file from the bucket
 '
 }
 
