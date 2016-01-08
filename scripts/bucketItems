@@ -1,0 +1,28 @@
+#!/bin/bash
+
+[[ -f ./tools ]] && source ./tools
+[[ -f ./scripts/tools ]] && source ./scripts/tools
+source $ROOT/scripts/credentials
+
+if [ "$1" != "" ]; then
+	bucket=$(bucketName $1)
+	if [[ $bucket == "" ]]; then
+		echo "Error: missing bucket name or invalid!"
+		exit
+	fi
+fi
+
+response=$(curl -H "Authorization: ${access_token}" -X GET ${APIHost}oss/v2/buckets/${bucket}/objects -k)
+#echo $response | python -m json.tool
+
+errorCode=$(echo $response | jsonValue errorCode 1)
+if [ "$errorCode" != "" ]; then
+	developerMessage=$(echo $response | jsonValue developerMessage 1)
+	echo "${errorCode} - ${developerMessage}"
+	if [ "${errorCode}" == "AUTH-006" ]; then
+		echo "You need to be added to the White List to use this API - please contact us to be added"
+	fi
+	exit
+fi
+
+echo $response | python -m json.tool

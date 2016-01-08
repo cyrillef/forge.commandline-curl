@@ -19,6 +19,11 @@ function jsonValueAtPath () {
 	cat | python -c "import json,sys;obj=json.load(sys.stdin);print obj${KEY}"
 }
 
+function jsonValueAtKey () {
+	local KEY=$1
+	cat | python -c "import json,sys;obj=json.load(sys.stdin);print obj['${KEY}'] if '$KEY' in obj.keys() else ''"
+}
+
 function xbase64encode () {
 	#id64=$(echo $1 | base64 -) # not correct
 	local id=$1
@@ -35,4 +40,9 @@ function bucketName () {
 	local key=$1
 	chk=$(echo $key | grep -E "^[-_.a-z0-9]{3,128}$")
 	echo $chk
+}
+
+function extractParamFromUrl () {
+	param=$(python -c "import urlparse;result=urlparse.urlparse(\"$1\");r2=urlparse.parse_qs(result.query);print r2['startAt'][0]")
+	echo $param
 }

@@ -1,0 +1,41 @@
+#!/bin/bash
+
+[[ -f ./tools ]] && source ./tools
+[[ -f ./scripts/tools ]] && source ./scripts/tools
+source $ROOT/scripts/credentials
+
+limit=10
+if [ "$1" != "" ]; then
+	limit=$1
+fi
+index=$2
+
+echo "Listing from ${index} to ${limit}"
+if [ "${index}" != "" ]; then
+	echo "${APIHost}oss/v2/buckets?startAt=${index}&limit=${limit}"
+	response=$(curl -H "Authorization: ${access_token}" -X GET ${APIHost}oss/v2/buckets?startAt=${index}&limit=${limit} -k)
+else
+	echo "${APIHost}oss/v2/buckets?limit=${limit}"
+	response=$(curl -H "Authorization: ${access_token}" -X GET ${APIHost}oss/v2/buckets?limit=${limit} -k)
+fi
+#echo $response | python -m json.tool
+
+errorCode=$(echo $response | jsonValue errorCode 1)
+if [ "$errorCode" != "" ]; then
+	developerMessage=$(echo $response | jsonValue developerMessage 1)
+	echo "${errorCode} - ${developerMessage}"
+	if [ "${errorCode}" == "AUTH-006" ]; then
+		echo "You need to be added to the White List to use this API - please contact us to be added"
+	fi
+	exit
+fi
+
+echo $response | python -m json.tool
+
+bnext=$(echo $response | jsonValueAtKey 'next')
+if [ "$bnext" == "" ]; then
+	echo "Your search is complete, no more items to list"
+else
+	startAt=$(extractParamFromUrl $bnext)
+	echo "Your next search index is: ${startAt}"
+fi

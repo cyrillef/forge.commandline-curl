@@ -1,0 +1,25 @@
+#!/bin/bash
+
+[[ -f ./tools ]] && source ./tools
+[[ -f ./scripts/tools ]] && source ./scripts/tools
+source $ROOT/scripts/credentials
+
+master=$1
+masterUri=`echo $master | sed 's/ /+/g'`
+masterHdd=`echo $masterUri | sed 's/+/ /g'`
+
+id=$(cat "$ROOT/data/${bucket}.${masterHdd}.json" | jsonValueAtPath '["objects"][0]["location"]')
+echo "Downloading file ${id}" 
+output=$2
+temp="$ROOT/temp/${output}.tmp"
+headers="$ROOT/temp/${output}.txt"
+
+response=$(curl -i -H "Authorization: ${access_token}" -o ${temp} -D ${headers} -X GET ${id} -k)
+cat $headers
+
+bytes=`cat ${headers} | grep -i 'Content-Length' | sed 's/Content-Length: //i'`
+bcount=`wc -c ${headers}`
+
+rm $headers
+tail -c $bytes $temp > $output
+rm $temp

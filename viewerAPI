@@ -9,7 +9,12 @@ function usage () {
   viewerAPI command [arg]
 
     auth           - get an access token (no argument)
-    buckets        - list buckets
+    buckets [[-s] [limit] [index]]
+                   - list local buckets
+                     -s / --server : list buckets on the server
+                       limit: <optional=10> how many to return
+                       index: <optional=0> where to start in the list
+                       ex: -s 10 30 -> will return the 30th to the 39th items
     bucket [<Name>]
                    - set or get the current bucket
     bucketCreate <Name> [<Type>]
@@ -19,9 +24,19 @@ function usage () {
     bucketCheck [<Name>]
                    - check bucket validity, outputs the expiration
                      date/time for this bucket
+                     if no parameter use the current bucket
+    bucketItems [<Name>]
+                   - list items in a given bucket
+                     required to be in the API white list to use this API
+                     if no parameter use the current bucket
+	bucketDelete [<Name>]
+                   - delete a given bucket
+                     if no parameter delete the current bucket
     upload [-h] <File>
                    - upload a file in the current bucket
                      -h for list of supported format
+	download <FileKey> <OutputFile>
+                   - download the file from OSS
     objectDetails <FileKey>
                    - file information
     register <FileKey>
@@ -69,14 +84,21 @@ case "$1" in
 		fi
 		;;
 	"buckets")
-		regex="(.*)\.bucket\.json"
-		ll=$(ls $ROOT/data/*.bucket.json)
-		for l in $ll; do
-			lb=$(basename $l)
-			[[ $lb =~ $regex ]]
-			name="${BASH_REMATCH[1]}"
-			echo $name
-        done
+		if [ "$2" != "-s" ] && [ "$2" != "--server" ]; then
+			regex="(.*)\.bucket\.json"
+			ll=$(ls $ROOT/data/*.bucket.json)
+			for l in $ll; do
+				lb=$(basename $l)
+				[[ $lb =~ $regex ]]
+				name="${BASH_REMATCH[1]}"
+				echo $name
+			done
+			exit
+		fi
+		cmd=$1
+		shift
+		shift # -s / -- server
+		$ROOT/scripts/${cmd} "$@"
 		;;
 	# "bucketCreate") "bucketCheck") "upload") "objectDetails")
 	# "register") "registerProgress") "viewable") "thumbnail")
