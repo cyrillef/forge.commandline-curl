@@ -17,9 +17,11 @@ headers="$ROOT/temp/${output}.txt"
 response=$(curl -i -H "Authorization: ${access_token}" -o ${temp} -D ${headers} -X GET ${id} -k)
 cat $headers
 
-bytes=`cat ${headers} | grep -i 'Content-Length' | sed 's/Content-Length: //i'`
-bcount=`wc -c ${headers}`
+bytes=`cat ${headers} | grep -i 'Content-Length' | tr -d '\r' | sed 's/Content-Length: \([0-9]*\)/\1/'`
+hcount=`wc -c ${headers} | sed 's/[ ]*\([0-9]*\).*/\1/'`
+#echo "bytes count = ${bytes} - headers = ${hcount}"
 
 rm $headers
+#echo "tail -c $bytes $temp > $output"
 tail -c $bytes $temp > $output
 rm $temp

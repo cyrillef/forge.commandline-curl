@@ -29,13 +29,15 @@ function usage () {
                    - list items in a given bucket
                      required to be in the API white list to use this API
                      if no parameter use the current bucket
-	bucketDelete [<Name>]
+    bucketDelete [<Name>]
                    - delete a given bucket
                      if no parameter delete the current bucket
     upload [-h] <File>
                    - upload a file in the current bucket
                      -h for list of supported format
-	download <FileKey> <OutputFile>
+    resumable <File> <Pieces>
+                   - upload a file in multiple pieces (i.e. resumables)
+    download <FileKey> <OutputFile>
                    - download the file from OSS
     objectDetails <FileKey>
                    - file information

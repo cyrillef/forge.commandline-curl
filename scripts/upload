@@ -48,7 +48,7 @@ fullpath=$1
 filename=$(basename $fullpath)
 filenameUri=`echo $filename | sed 's/ /+/g'`
 
-response=$(curl --header "Authorization: ${access_token}" -H "Content-Type:application/octet-stream" --header "Expect:" --upload-file "$fullpath" -X PUT "${APIHost}oss/v1/buckets/${bucket}/objects/${filenameUri}" -k)
+response=$(curl --header "Authorization: ${access_token}" -H "Content-Type:application/octet-stream" --upload-file "$fullpath" -X PUT "${APIHost}oss/v1/buckets/${bucket}/objects/${filenameUri}" -k)
 
 echo $response | python -m json.tool
 
