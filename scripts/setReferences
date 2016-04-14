@@ -6,8 +6,8 @@ source $ROOT/scripts/credentials
 
 # Step 5: Setup References between multiple files
 master=$1
-masterUri=`echo $master | sed 's/ /+/g'`
-masterHdd=`echo $masterUri | sed 's/+/ /g'`
+masterUri=`echo "$master" | sed 's/ /+/g'`
+masterHdd=`echo "$masterUri" | sed 's/+/ /g'`
 
 id=$(cat "$ROOT/data/${bucket}.${masterHdd}.json" | jsonValueAtPath '["objects"][0]["id"]')
 parentPath=$(basename $id)
@@ -17,11 +17,11 @@ for f in "$@"; do
 	if [ "$f" == "${master}" ]; then
 		continue
 	fi
-    fUri=`echo $f | sed 's/ /+/g'`
-    fHdd=`echo $fUri | sed 's/+/ /g'`
+    fUri=`echo "$f" | sed 's/ /+/g'`
+    fHdd=`echo "$fUri" | sed 's/+/ /g'`
 
-	id=$(cat $ROOT/data/${bucket}.${fHdd}.json | jsonValueAtPath '["objects"][0]["id"]')
-	childPath=$(basename $id)
+	id=$(cat "$ROOT/data/${bucket}.${fHdd}.json" | jsonValueAtPath '["objects"][0]["id"]')
+	childPath=$(basename "$id")
 	st=$st"{ \"file\" : \"${id}\", \"metadata\" : { \"childPath\" : \"${childPath}\", \"parentPath\" : \"$parentPath\" } },"
 done
 st="${st%?}] }"

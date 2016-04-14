@@ -45,11 +45,10 @@ if [ ! -f "$1" ]; then
 fi
 
 fullpath=$1
-filename=$(basename $fullpath)
-filenameUri=`echo $filename | sed 's/ /+/g'`
+filename=$(basename "$fullpath")
+filenameUri=`echo "$filename" | sed 's/ /+/g'`
 
 response=$(curl --header "Authorization: ${access_token}" -H "Content-Type:application/octet-stream" --upload-file "$fullpath" -X PUT "${APIHost}oss/v1/buckets/${bucket}/objects/${filenameUri}" -k)
-
 echo $response | python -m json.tool
 
 id=$(echo $response | jsonValueAtPath '["objects"][0]["id"]')
@@ -57,5 +56,6 @@ echo "ID: $id"
 location=$(echo $response | jsonValueAtPath '["objects"][0]["location"]')
 echo "Location: $location"
 
-filenameHdd=`echo $filenameUri | sed 's/+/ /g'`
+filenameHdd=`echo "$filenameUri" | sed 's/+/ /g'`
+#echo "Data saved: $ROOT/data/${bucket}.${filenameHdd}.json"
 echo $response > "$ROOT/data/${bucket}.${filenameHdd}.json"

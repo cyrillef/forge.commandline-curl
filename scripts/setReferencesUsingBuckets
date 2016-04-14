@@ -6,8 +6,8 @@ source $ROOT/scripts/credentials
 
 # Step 5: Setup References between multiple files
 master=$1
-masterUri=`echo $master | sed 's/ /+/g'`
-masterHdd=`echo $masterUri | sed 's/+/ /g'`
+masterUri=`echo "$master" | sed 's/ /+/g'`
+masterHdd=`echo "$masterUri" | sed 's/+/ /g'`
 
 ll=$(ls "$ROOT/data/${bucket}.*.json")
 for f in $ll; do

@@ -15,8 +15,8 @@ if [ "$2" == "" ]; then
 fi
 
 fullpath=$1
-filename=$(basename $fullpath)
-filenameUri=`echo $filename | sed 's/ /+/g'`
+filename=$(basename "$fullpath")
+filenameUri=`echo "$filename" | sed 's/ /+/g'`
 
 pieces=$2
 filesz=$(wc -c "$fullpath" | awk '{print $1}')
@@ -99,7 +99,7 @@ for i in $(seq 1 $pieces); do
 done
 
 # Finally save the details of that object
-response=$(curl -H "Authorization: ${access_token}" -X GET ${APIHost}oss/v1/buckets/${bucket}/objects/${filenameUri}/details -k)
+response=$(curl -H "Authorization: ${access_token}" -X GET "${APIHost}oss/v1/buckets/${bucket}/objects/${filenameUri}/details" -k)
 echo $response | python -m json.tool
-filenameHdd=`echo $filenameUri | sed 's/+/ /g'`
+filenameHdd=`echo "$filenameUri" | sed 's/+/ /g'`
 echo $response > "$ROOT/data/${bucket}.${filenameHdd}.json"

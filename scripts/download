@@ -5,8 +5,8 @@
 source $ROOT/scripts/credentials
 
 master=$1
-masterUri=`echo $master | sed 's/ /+/g'`
-masterHdd=`echo $masterUri | sed 's/+/ /g'`
+masterUri=`echo "$master" | sed 's/ /+/g'`
+masterHdd=`echo "$masterUri" | sed 's/+/ /g'`
 
 id=$(cat "$ROOT/data/${bucket}.${masterHdd}.json" | jsonValueAtPath '["objects"][0]["location"]')
 echo "Downloading file ${id}" 

@@ -5,8 +5,8 @@
 source $ROOT/scripts/credentials
 
 master=$1
-masterUri=`echo $master | sed 's/ /+/g'`
-masterHdd=`echo $masterUri | sed 's/+/ /g'`
+masterUri=`echo "$master" | sed 's/ /+/g'`
+masterHdd=`echo "$masterUri" | sed 's/+/ /g'`
 
 response=$(curl -H "Authorization: ${access_token}" -X GET ${APIHost}oss/v1/buckets/${bucket}/objects/${masterUri}/details -k)
 echo $response | python -m json.tool
