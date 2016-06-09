@@ -1,14 +1,23 @@
-# workflow-curl-view.and.data.api
+# viewer-curl-sample
 
-Demonstrates the Autodesk View and Data API authorisation and translation process using cURL in command line scripts.
+
+[![Viewer](https://img.shields.io/badge/Forge%20Viewer-v2.8-green.svg)](http://developer-autodesk.github.io/)
+![Platforms](https://img.shields.io/badge/platform-windows%20%7C%20osx%20%7C%20linux-lightgray.svg)
+[![License](http://img.shields.io/:license-mit-blue.svg)](http://opensource.org/licenses/MIT)
+
+
+<b>Note:</b> For using this sample, you need a valid oAuth credential for the translation / extraction portion.
+Visit this [page](https://developer.autodesk.com) for instructions to get on-board.
+
+
+Demonstrates the Autodesk View and Data API authorisation and translation process using cURL 
+in command line scripts.
 
 
 ## Description
 
-The workflow-curl-view.and.data.api sample exercises the curl commands demonstrating the Autodesk View and Data API authorisation and translation process mentioned in the Quick Start guide.
-
-It closely follows the steps described in the documentation:
-* http://developer.api.autodesk.com/documentation/v1/vs_quick_start.html
+This sample exercises the curl commands demonstrating the Forge OAuth authorisation and 
+Model Derivatives API mentioned in the Quick Start guide.
 
 In order to make use of this sample, you need to register your consumer key, of course:
 * https://developer.autodesk.com > My Apps
@@ -18,9 +27,12 @@ This provides the credentials to supply to the curl command script arguments.
 
 ## Motivation
 
-What do you think about setting up a sample repository that does nothing but execute the sample shell scripts provided in the quick start documentation?
+What do you think about setting up a sample repository that does nothing but execute the 
+sample shell scripts provided in the quick start documentation?
 
-That would presumably help developers debugging their processes quickly. Probably everyone is copying and modifying those curl commands anyway. Here is therefore a set of Unix shell scripts. The Mac/Linux versions use BASH script/Python which are installed by default anyway.
+That would presumably help developers debugging their processes quickly. Probably everyone is 
+copying and modifying those curl commands anyway. Here is therefore a set of Unix shell scripts. 
+The Mac/Linux versions use BASH script/Python which are installed by default anyway.
 
 
 ## Dependencies
@@ -31,7 +43,12 @@ Standard OS functionality, Bash, cURL and Python.
 * https://en.wikipedia.org/wiki/Bash_(Unix_shell)
 * https://en.wikipedia.org/wiki/Python_(programming_language)
 
-This sample targets Mac OSX and Unix only, it should run on different distribution of Linux but was tested on Ubuntu and Fedora only at this time. Windows user, you need to install a Unix shell like [cygwin](http://cygwin.com), but the sample requires bash 3.2 minimum to run. See the Windows special setup instructions for more details.
+This sample targets Mac OSX and Unix only, it should run on different distribution of Linux but was tested 
+on Ubuntu and Fedora only at this time. 
+
+Windows user, you need to install a Unix shell like [cygwin](http://cygwin.com), but the sample requires 
+bash 3.2 minimum to run. See the Windows special setup instructions for more details.
+
 
 ## Setup/Usage Instructions
 
@@ -119,6 +136,7 @@ Here is a copy of the log file from a successful real-world execution run on Mac
 
 This sample assumes using port 80. If you want another port make sure to specify the port number in credentials.js.
 
+
 ### Mac OSX
 
 Starting Mountain Lion, there is an Apache WEB server pre-installed on Mac OS X, so there is no need to install it. However, you need to start the Apache WEB server, using a Terminal window.
@@ -158,12 +176,13 @@ On all platform you may install the Node.js http-server utility. http-server is 
 
 ## License
 
-workflow-curl-view.and.data.api is licensed under the terms of the [MIT License](http://opensource.org/licenses/MIT). Please see the [LICENSE](LICENSE) file for full details.
+This sample is licensed under the terms of the [MIT License](http://opensource.org/licenses/MIT). 
+Please see the [LICENSE](LICENSE) file for full details.
 
 
 ## Written by
 
-Cyrille Fauvel, Autodesk Inc. <br />
+Cyrille Fauvel <br />
 Autodesk Developer Network <br />
 http://www.autodesk.com/adn <br />
 http://around-the-corner.typepad.com <br />
