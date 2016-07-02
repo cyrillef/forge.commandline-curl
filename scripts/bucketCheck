@@ -22,17 +22,16 @@ if [ "$errorCode" != "" ]; then
 	exit
 fi
 
-dtv=$(echo $response | jsonValue createDate 1)
-dt=$(date -r "$dtv")
+#dtv=$(echo $response | jsonValue createdDate 1)
+#dt=$(date -r "$dtv")
 #echo "createDate = $dt"
+#dt=$(date -r "$dtv" -v +30d)
 
 policyKey=$(echo $response | jsonValue policyKey 1)
 if [ "$policyKey" == "transient" ]; then # 24 hours
-	dt=$(date -r "$dtv" -v +1d)
+	echo "bucket content will expire after: 24 hours"
 elif [ "$policyKey" == "temporary" ]; then # 30 days
-	dt=$(date -r "$dtv" -v +30d)
+	echo "bucket content will expire after: 30 days"
 else # persistent
-	echo "bucket will never expire"
-	exit
+	echo "bucket content will never expire"
 fi
-echo "bucket will expire at: $dt"
