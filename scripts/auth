@@ -8,7 +8,8 @@ source $ROOT/scripts/credentials
 
 # Step 2: Get your access token
 
-response=$(curl --data "client_id=${ConsumerKey}&client_secret=${ConsumerSecret}&grant_type=client_credentials" ${APIHost}authentication/v1/authenticate --header "Content-Type: application/x-www-form-urlencoded" -k)
+SCOPES="data:read%20data:write%20data:create%20data:search%20bucket:create%20bucket:read%20bucket:update%20bucket:delete"
+response=$(curl --data "client_id=${ConsumerKey}&client_secret=${ConsumerSecret}&grant_type=client_credentials&scope=${SCOPES}" ${APIHost}authentication/v1/authenticate --header "Content-Type: application/x-www-form-urlencoded" -k)
 
 #echo $response | python -m json.tool
 
