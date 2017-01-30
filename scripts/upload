@@ -1,46 +1,14 @@
 #!/bin/bash
 
-[[ -f ./tools ]] && source ./tools
-[[ -f ./scripts/tools ]] && source ./scripts/tools
-source $ROOT/scripts/credentials
+[[ -f ./_tools ]] && source ./_tools
+[[ -f ./scripts/_tools ]] && source ./scripts/_tools
+source $ROOT/scripts/_config
 
-function responseList () {
-    local KEY=$1
-    shift
-	echo $* | python -c '
-import json, sys
-obj =json.load (sys.stdin)
-keys =obj ["channelMapping"].keys ()
-keys.sort ()
-for x in keys:
-  if obj ["channelMapping"] [x].startswith (u"'${KEY}'"):
-    print x,
-'
-}
-
-# Step 4: Upload a file
-
-if [ "$1" == "-h" ] || [ "$1" == "" ]; then
-	response=$(curl -k --header "Authorization: ${access_token}" ${APIHost}viewingservice/v1/supported)
-    errorCode=$(echo $response | jsonValue errorCode 1)
-    if [ "$errorCode" != "" ]; then
-	   developerMessage=$(echo $response | jsonValue developerMessage 1)
-	   echo "${errorCode} - ${developerMessage}"
-	   exit
-    fi
-    
-	#echo $response | python -m json.tool
-    echo "Viewables"
-    responseList 'viewing' <<< echo $response
-    echo ""
-    echo "Data"
-    responseList 'extraction' <<< echo $response
-    echo ""
-    exit
-fi
+#    upload <File>
+#          - upload a file in the current bucket
 
 if [ ! -f "$1" ]; then
-	echo "No such file: $1"
+	echo "File not found: $1"
 	exit
 fi
 
@@ -48,14 +16,20 @@ fullpath=$1
 filename=$(basename "$fullpath")
 filenameUri=`echo "$filename" | sed 's/ /+/g'`
 
-response=$(curl --header "Authorization: ${access_token}" -H "Content-Type:application/octet-stream" --upload-file "$fullpath" -X PUT "${APIHost}oss/v1/buckets/${bucket}/objects/${filenameUri}" -k)
-echo $response | python -m json.tool
+response=$(curl --header "Authorization: ${access_token}" -H "Content-Type:application/octet-stream" \
+	--upload-file "$fullpath" -X PUT "${APIHost}oss/v2/buckets/${bucket}/objects/${filenameUri}" -k)
+#echo $response | jq .
 
-id=$(echo $response | jsonValueAtPath '["objects"][0]["id"]')
+reason=$(echo $response | jq --raw-output .reason)
+if [ "$reason" != "null" ]; then
+	echo "${reason}"
+	exit
+fi
+
+id=$(echo $response | jq --raw-output .objectId)
 echo "ID: $id"
-location=$(echo $response | jsonValueAtPath '["objects"][0]["location"]')
+location=$(echo $response | jq --raw-output .location)
 echo "Location: $location"
 
 filenameHdd=`echo "$filenameUri" | sed 's/+/ /g'`
-#echo "Data saved: $ROOT/data/${bucket}.${filenameHdd}.json"
 echo $response > "$ROOT/data/${bucket}.${filenameHdd}.json"

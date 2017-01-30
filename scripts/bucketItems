@@ -1,28 +1,64 @@
 #!/bin/bash
 
-[[ -f ./tools ]] && source ./tools
-[[ -f ./scripts/tools ]] && source ./scripts/tools
-source $ROOT/scripts/credentials
+[[ -f ./_tools ]] && source ./_tools
+[[ -f ./scripts/_tools ]] && source ./scripts/_tools
+source $ROOT/scripts/_config
 
-if [ "$1" != "" ]; then
-	bucket=$(bucketName $1)
-	if [[ $bucket == "" ]]; then
-		echo "Error: missing bucket name or invalid!"
-		exit
-	fi
-fi
+#	bucketItems [<Name>] [-a <startAt>] [-l <limit>]
+#		- list items in a given bucket
+#		  if no parameter use the current bucket
+#		  -a / --startAt <startAt> : where to start in the list [string, default: none]
+#		  -l / --limit <limit> : how many to return [integer, default: 10]
 
-response=$(curl -H "Authorization: ${access_token}" -X GET ${APIHost}oss/v2/buckets/${bucket}/objects -k)
-#echo $response | python -m json.tool
+limit=10
+startAt=""
+while [[ $# -gt 1 ]]; do
+	key="$1"
+	case $key in
+        -a|--startAt)
+            startAt="$2"
+            shift # past argument
+            ;;
+        -l|--limit)
+            limit="$2"
+            shift # past argument
+            ;;
+        *)
+            bucket=$(bucketName $1)
+            ;;
+	esac
+	shift # past argument or value
+done
 
-errorCode=$(echo $response | jsonValue errorCode 1)
-if [ "$errorCode" != "" ]; then
-	developerMessage=$(echo $response | jsonValue developerMessage 1)
-	echo "${errorCode} - ${developerMessage}"
-	if [ "${errorCode}" == "AUTH-006" ]; then
-		echo "You need to be added to the White List to use this API - please contact us to be added"
-	fi
+if [[ "$bucket" == "" ]]; then
+	echo "Error: missing bucket name or invalid name!"
 	exit
 fi
 
-echo $response | python -m json.tool
+echo "Listing from ${startAt} to ${limit}"
+if [ "${startAt}" != "" ]; then
+	echo "${APIHost}oss/v2/buckets/${bucket}/objects?startAt=${startAt}&limit=${limit}"
+	response=$(curl -H "Authorization: ${access_token}" \
+		-X GET ${APIHost}oss/v2/buckets/${bucket}/objects?startAt=${startAt}&limit=${limit} -k)
+else
+	echo "${APIHost}oss/v2/buckets?limit=${limit}"
+	response=$(curl -H "Authorization: ${access_token}" \
+		-X GET ${APIHost}oss/v2/buckets/${bucket}/objects?limit=${limit} -k)
+fi
+#echo $response | jq .
+
+reason=$(echo $response | jq --raw-output .reason)
+if [ "$reason" != "null" ]; then
+	echo "${reason}"
+	exit
+fi
+
+echo $response | jq .
+
+next=$(echo $response | jq --raw-output .next)
+if [ "$next" == "" ]; then
+	echo "Your search is complete, no more items to list"
+else
+	startAt=$(echo $response | jq --raw-output '.next | capture("(?<startAt>startAt=[-_.a-z0-9]{3,128})") | .startAt | split ("=") | .[1]')
+	echo "Your next search index is: ${startAt}"
+fi

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+if [ "$ROOT" == "" ]; then
+	ROOT="`dirname \"$0\"`" # Relative
+	export ROOT="`( cd \"$ROOT\" && pwd )`" # Absolutized and normalized
+	if [ $(basename $ROOT) == scripts ]; then
+		export ROOT=$(dirname $ROOT)
+	fi
+fi
+
+function bucketName () { local key=$1; chk=$(echo $key | grep -E "^[-_.a-z0-9]{3,128}$"); echo $chk; }
+function xbase64encode () { local id64=$(echo -ne $1 | base64); echo $id64; }
+function xbase64safeencode () { local id64=$(echo -ne $1 | base64 | tr -d '=' | tr '+/' '-_'); echo $id64; }
+function xbase64decode () { local id=$(echo -ne $1 | base64 --decode); echo $id; }
+function xbase64safedecode () { local id=$(echo -ne $1 | tr '-_' '+/' | base64 --decode); echo $id; }
+function join () { local d=$1; shift; echo -n "$1"; shift; printf -v REPLY "%s" "${@/#/$d}"; echo "${REPLY}"; }
+function join1 () { local IFS="$1"; shift; echo "$*"; }
+function split () { IFS=' ' read -r -a array <<< $1; echo "${array[$2]}"; }

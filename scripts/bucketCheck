@@ -1,33 +1,30 @@
 #!/bin/bash
 
-[[ -f ./tools ]] && source ./tools
-[[ -f ./scripts/tools ]] && source ./scripts/tools
-source $ROOT/scripts/credentials
+[[ -f ./_tools ]] && source ./_tools
+[[ -f ./scripts/_tools ]] && source ./scripts/_tools
+source $ROOT/scripts/_config
 
-if [ "$1" != "" ]; then
-	bucket=$(bucketName $1)
-	if [[ $bucket == "" ]]; then
-		echo "Error: missing bucket name or invalid!"
-		exit
-	fi
-fi
+#    bucketCheck [<Name>]
+#                   - check bucket validity, outputs the expiration
+#                     date/time for this bucket
+#                     if no parameter use the current bucket
 
-response=$(curl -H "Authorization: ${access_token}" -X GET ${APIHost}oss/v1/buckets/${bucket}/details -k)
-#echo $response | python -m json.tool
-
-errorCode=$(echo $response | jsonValue errorCode 1)
-if [ "$errorCode" != "" ]; then
-	developerMessage=$(echo $response | jsonValue developerMessage 1)
-	echo "${errorCode} - ${developerMessage}"
+bucket=$(bucketName $1)
+if [[ "$bucket" == "" ]]; then
+	echo "Error: missing bucket name or invalid name!"
 	exit
 fi
 
-#dtv=$(echo $response | jsonValue createdDate 1)
-#dt=$(date -r "$dtv")
-#echo "createDate = $dt"
-#dt=$(date -r "$dtv" -v +30d)
+response=$(curl -H "Authorization: ${access_token}" -X GET ${APIHost}oss/v2/buckets/${bucket}/details -k)
+#echo $response | jq .
 
-policyKey=$(echo $response | jsonValue policyKey 1)
+reason=$(echo $response | jq --raw-output .reason)
+if [ "$reason" != "null" ]; then
+	echo "${reason}"
+	exit
+fi
+
+policyKey=$(echo $response | jq --raw-output .policyKey)
 if [ "$policyKey" == "transient" ]; then # 24 hours
 	echo "bucket content will expire after: 24 hours"
 elif [ "$policyKey" == "temporary" ]; then # 30 days

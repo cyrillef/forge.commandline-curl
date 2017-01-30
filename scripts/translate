@@ -1,0 +1,54 @@
+#!/bin/bash
+
+[[ -f ./_tools ]] && source ./_tools
+[[ -f ./scripts/_tools ]] && source ./scripts/_tools
+source $ROOT/scripts/_config
+
+#    translate <FileKey>
+#          - translate the file for viewing
+
+master=$1
+masterUri=`echo "$master" | sed 's/ /+/g'`
+masterHdd=`echo "$masterUri" | sed 's/+/ /g'`
+
+id="urn:adsk.objects:os.object:${bucket}/${masterUri}"
+id64=$(xbase64encode $id)
+
+job='{
+	"input": {
+	  "urn": "'${id64}'",
+	  "compressedUrn": false,
+	  "rootFilename": "'${masterHdd}'"
+	},
+	"output": {
+	  "formats": [
+	    {
+	      "type": "svf",
+	      "views": [
+	        "2d",
+	        "3d"
+	      ]
+	    }
+	  ]
+	}
+}'
+#job=$(echo $job | tr '\n' ' ')
+
+response=$(curl -H "Content-Type: application/json" -H "Authorization: ${access_token}" \
+	-H "x-ads-force: true" \
+	-X POST ${APIHost}modelderivative/v2/designdata/job -k \
+	-d "${job}")
+#echo $response | jq .
+
+diagnostic=$(echo $response | jq --raw-output .diagnostic)
+if [ "$diagnostic" != "null" ]; then
+	echo "${diagnostic}"
+	exit
+fi
+
+result=$(echo $response | jq --raw-output .result)
+if [ "$response" == "" ]; then
+	echo "Translation request successful!"
+elif [ "$result" != "null" ]; then
+	echo "Translation request: ${result}"
+fi

@@ -1,41 +1,65 @@
 #!/bin/bash
 
-[[ -f ./tools ]] && source ./tools
-[[ -f ./scripts/tools ]] && source ./scripts/tools
-source $ROOT/scripts/credentials
+[[ -f ./_tools ]] && source ./_tools
+[[ -f ./scripts/_tools ]] && source ./scripts/_tools
+source $ROOT/scripts/_config
+
+#    buckets [-s [-a <startAt>] [-l <limit>] [-r <region>]] \n\
+#        - list local buckets \n\
+#          -s / --server : list buckets on the server \n\
+#          -a / --startAt <startAt> : where to start in the list [string, default: none] \n\
+#          -l / --limit <limit> : how many to return [integer, default: 10] \n\
+#          -r / --region <region> : US or EMEA [string, default: US] \n\
 
 limit=10
-if [ "$1" != "" ]; then
-	limit=$1
-fi
-index=$2
+startAt=""
+region="US"
+while [[ $# -gt 1 ]]; do
+	key="$1"
+	case $key in
+        -a|--startAt)
+            startAt="$2"
+            shift # past argument
+            ;;
+        -l|--limit)
+            limit="$2"
+            shift # past argument
+            ;;
+        -r|--region)
+            region="$2"
+            shift # past argument
+            ;;
+        *)
+            # unknown option
+            ;;
+	esac
+	shift # past argument or value
+done
 
-echo "Listing from ${index} to ${limit}"
-if [ "${index}" != "" ]; then
-	echo "${APIHost}oss/v2/buckets?startAt=${index}&limit=${limit}"
-	response=$(curl -H "Authorization: ${access_token}" -X GET ${APIHost}oss/v2/buckets?startAt=${index}&limit=${limit} -k)
+echo "Listing from ${startAt} to ${limit}"
+if [ "${startAt}" != "" ]; then
+	echo "${APIHost}oss/v2/buckets?startAt=${startAt}&limit=${limit}"
+	response=$(curl -H "Authorization: ${access_token}" \
+		-X GET ${APIHost}oss/v2/buckets?startAt=${startAt}&limit=${limit} -k)
 else
 	echo "${APIHost}oss/v2/buckets?limit=${limit}"
-	response=$(curl -H "Authorization: ${access_token}" -X GET ${APIHost}oss/v2/buckets?limit=${limit} -k)
+	response=$(curl -H "Authorization: ${access_token}" \
+		-X GET ${APIHost}oss/v2/buckets?limit=${limit} -k)
 fi
-#echo $response | python -m json.tool
+#echo $response | jq .
 
-errorCode=$(echo $response | jsonValue errorCode 1)
-if [ "$errorCode" != "" ]; then
-	developerMessage=$(echo $response | jsonValue developerMessage 1)
-	echo "${errorCode} - ${developerMessage}"
-	if [ "${errorCode}" == "AUTH-006" ]; then
-		echo "You need to be added to the White List to use this API - please contact us to be added"
-	fi
+reason=$(echo $response | jq --raw-output .reason)
+if [ "$reason" != "null" ]; then
+	echo "${reason}"
 	exit
 fi
 
-echo $response | python -m json.tool
+echo $response | jq .
 
-bnext=$(echo $response | jsonValueAtKey 'next')
-if [ "$bnext" == "" ]; then
+next=$(echo $response | jq --raw-output .next)
+if [ "$next" == "" ]; then
 	echo "Your search is complete, no more items to list"
 else
-	startAt=$(extractParamFromUrl $bnext)
+	startAt=$(echo $response | jq --raw-output '.next | capture("(?<startAt>startAt=[-_.a-z0-9]{3,128})") | .startAt | split ("=") | .[1]')
 	echo "Your next search index is: ${startAt}"
 fi

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+[[ -f ./_tools ]] && source ./_tools
+[[ -f ./scripts/_tools ]] && source ./scripts/_tools
+source $ROOT/scripts/_config
+
+#    metadata <FileKey>
+#          - urn metadata
+
+master=$1
+masterUri=`echo "$master" | sed 's/ /+/g'`
+masterHdd=`echo "$masterUri" | sed 's/+/ /g'`
+
+id="urn:adsk.objects:os.object:${bucket}/${masterUri}"
+id64=$(xbase64safeencode $id)
+
+response=$(curl -H "Content-Type: application/json" -H "Authorization: ${access_token}" \
+	-X GET ${APIHost}modelderivative/v2/designdata/${id64}/metadata -k)
+echo $response | jq .

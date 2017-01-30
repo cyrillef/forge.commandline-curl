@@ -1,18 +1,19 @@
 #!/bin/bash
 
-[[ -f ./tools ]] && source ./tools
-[[ -f ./scripts/tools ]] && source ./scripts/tools
-source $ROOT/scripts/credentials
+[[ -f ./_tools ]] && source ./_tools
+[[ -f ./scripts/_tools ]] && source ./scripts/_tools
+source $ROOT/scripts/_config
 
-if [ "$1" != "" ]; then
-	bucket=$(bucketName $1)
-	if [[ $bucket == "" ]]; then
-		echo "Error: missing bucket name or invalid!"
-		exit
-	fi
+#    bucketDelete [<Name>]
+#                   - delete a given bucket
+#                     if no parameter delete the current bucket
+
+bucket=$(bucketName $1)
+if [[ "$bucket" == "" ]]; then
+	echo "Error: missing bucket name or invalid name!"
+	exit
 fi
 
 echo "Deleting bucket: ${bucket}"
 response=$(curl -H "Authorization: ${access_token}" -X DELETE ${APIHost}oss/v2/buckets/${bucket} -k)
-#echo $response | python -m json.tool
-echo $response
+echo $response | jq .

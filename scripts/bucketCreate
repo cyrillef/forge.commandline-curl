@@ -1,46 +1,48 @@
 #!/bin/bash
 
-[[ -f ./tools ]] && source ./tools
-[[ -f ./scripts/tools ]] && source ./scripts/tools
-source $ROOT/scripts/credentials
+[[ -f ./_tools ]] && source ./_tools
+[[ -f ./scripts/_tools ]] && source ./scripts/_tools
+source $ROOT/scripts/_config
 
-# Step 3: Create a bucket
+#	bucketCreate <Name> [<Type>]
+#		- create a new bucket,
+#		  default Type is transient, values can be
+#		  transient/temporary/persistent
+
 bucket=$(bucketName $1)
-
-if [[ $bucket == "" ]]; then
-	echo "Error: missing bucket name or invalid!"
+if [[ "$bucket" == "" ]]; then
+	echo "Error: missing bucket name or invalid name!"
 	exit
 fi
 
 bucketType=$2
-
-if [[ $bucketType == "" ]]; then
+if [[ "$bucketType" == "" ]]; then
 	bucketType="transient"
 fi
 
 # Does it exist already? (see bucketCheck)
-response=$(curl -H "Authorization: ${access_token}" -X GET ${APIHost}oss/v1/buckets/${bucket}/details -k)
-#echo $response | python -m json.tool
+response=$(curl -H "Authorization: ${access_token}" -X GET ${APIHost}oss/v2/buckets/${bucket}/details -k)
+#echo $response | jq .
 
-errorCode=$(echo $response | jsonValue errorCode 1)
-if [ "$errorCode" != "" ]; then
-	developerMessage=$(echo $response | jsonValue developerMessage 1)
-	echo "${errorCode} - ${developerMessage}"
-	exit
-fi
-key=$(echo $response | jsonValue key 1)
-if [ "$key" != "" ]; then
+key=$(echo $response | jq --raw-output .key)
+if [ "$key" != "null" ]; then
 	echo "Error - bucket already exists!"
-	#echo $response | python -m json.tool
+	exit
+fi
+reason=$(echo $response | jq --raw-output .reason)
+if [ "$reason" != "Bucket not found" ]; then
+	echo "${reason}"
 	exit
 fi
 
-response=$(curl --header "Content-Type: application/json" --header "Authorization: ${access_token}" --data "{\"bucketKey\":\"${bucket}\",\"policy\":\"${bucketType}\"}" ${APIHost}oss/v1/buckets -k)
-#echo $response | python -m json.tool
-key=$(echo $response | jsonValue key 1)
-if [ "$key" == "" ]; then
-	key=$(echo $response | jsonValue reason 1)
-	echo "Error - ${key}"
+response=$(curl --header "Content-Type: application/json" --header "Authorization: ${access_token}" \
+	--data "{\"bucketKey\":\"${bucket}\",\"policy\":\"${bucketType}\"}" ${APIHost}oss/v2/buckets -k)
+#echo $response | jq .
+
+key=$(echo $response | jq --raw-output .key)
+if [ "$key" == "null" ]; then
+	reason=$(echo $response | jq --raw-output .reason)
+	echo "Error - ${reason}"
 	exit
 fi
 echo "bucket ${key} created"

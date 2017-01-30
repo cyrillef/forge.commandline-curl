@@ -1,25 +1,27 @@
 #!/bin/bash
 
-[[ -f ./tools ]] && source ./tools
-[[ -f ./scripts/tools ]] && source ./scripts/tools
-source $ROOT/scripts/credentials
+[[ -f ./_tools ]] && source ./_tools
+[[ -f ./scripts/_tools ]] && source ./scripts/_tools
+source $ROOT/scripts/_config
+
+#    download <FileKey> <OutputFile>
+#          - download the file from OSS
 
 master=$1
 masterUri=`echo "$master" | sed 's/ /+/g'`
 masterHdd=`echo "$masterUri" | sed 's/+/ /g'`
 
-id=$(cat "$ROOT/data/${bucket}.${masterHdd}.json" | jsonValueAtPath '["objects"][0]["location"]')
-echo "Downloading file ${id}" 
 output=$2
 temp="$ROOT/temp/${output}.tmp"
 headers="$ROOT/temp/${output}.txt"
 
-response=$(curl -i -H "Authorization: ${access_token}" -o ${temp} -D ${headers} -X GET ${id} -k)
-cat $headers
+response=$(curl -i -H "Authorization: ${access_token}" -o ${temp} -D ${headers} \
+	-X GET ${APIHost}oss/v2/buckets/${bucket}/objects/${masterUri} -k)
+#cat $headers
 
 bytes=`cat ${headers} | grep -i 'Content-Length' | tr -d '\r' | sed 's/Content-Length: \([0-9]*\)/\1/'`
 hcount=`wc -c ${headers} | sed 's/[ ]*\([0-9]*\).*/\1/'`
-#echo "bytes count = ${bytes} - headers = ${hcount}"
+echo "bytes count = ${bytes} - headers = ${hcount}"
 
 rm $headers
 #echo "tail -c $bytes $temp > $output"

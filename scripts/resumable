@@ -1,22 +1,25 @@
 #!/bin/bash
 
-[[ -f ./tools ]] && source ./tools
-[[ -f ./scripts/tools ]] && source ./scripts/tools
-source $ROOT/scripts/credentials
+[[ -f ./_tools ]] && source ./_tools
+[[ -f ./scripts/_tools ]] && source ./scripts/_tools
+source $ROOT/scripts/_config
 
-# Step 4: Upload a file
+#    resumable <File> <Pieces>
+#          - upload a file in multiple pieces (i.e. resumables)
+
 if [ ! -f "$1" ]; then
-	echo "No such file: $1"
+	echo "File not found: $1"
 	exit
-fi
-if [ "$2" == "" ]; then
-    echo "Please specify how many pieces you want (minimum 2)"
-    exit
 fi
 
 fullpath=$1
 filename=$(basename "$fullpath")
 filenameUri=`echo "$filename" | sed 's/ /+/g'`
+
+if [ "$2" == "" ]; then
+    echo "Please specify how many pieces you want (minimum 2)"
+    exit
+fi
 
 pieces=$2
 filesz=$(wc -c "$fullpath" | awk '{print $1}')
@@ -24,8 +27,8 @@ piecesz=$((filesz / pieces))
 modsz=$((filesz % pieces))
 
 sessionId=$(cat /dev/urandom | env LC_CTYPE=C tr -dc 'a-z0-9' | fold -w 16 | head -n 1)
-sessionId="cyr"$sessionId
-echo $sessionId
+sessionId="cyr${sessionId}"
+echo "Current session: ${sessionId}"
 
 total=0
 for i in $(seq 1 $pieces); do
@@ -37,69 +40,41 @@ for i in $(seq 1 $pieces); do
         piecesz=$((end - pos + 1))
     fi
 
-    # When we use resumable upload, this is usally because the file is very big
+    # When we use resumable upload, this is usually because the file is very big
     # Here we make a new token to have better chance it is not expiring while
     # uploading on slow connections
-    response=$(curl --data "client_id=${ConsumerKey}&client_secret=${ConsumerSecret}&grant_type=client_credentials" ${APIHost}authentication/v1/authenticate --header "Content-Type: application/x-www-form-urlencoded" -k)
-    #echo $response | python -m json.tool
-    token_type=$(echo $response | jsonValue token_type 1)
-    if [ "$token_type" == "" ]; then
-        msg=$(echo $response | jsonValue "faultstring" 1)
-        echo "Failed to get your token"
-        echo "  $msg"
-        [[ -f $ROOT/data/access_token ]] && rm $ROOT/data/access_token
-        exit
-    fi
-    access_token=$(echo $response | jsonValue access_token 1)
-    expires_in=$(echo $response | jsonValue expires_in 1)
-    if [ "$OS" == "Windows_NT" ]; then
-        dt=$(date -d "+${expires_in} seconds")
-    else
-        dt=$(date -v "+${expires_in}S")
-    fi
-    echo "Your new access token is: ${token_type} ${access_token}"
-    echo "Expires at $dt"
-    echo "${token_type} ${access_token}" > $ROOT/data/access_token
-    access_token="${token_type} ${access_token}"
+	source $ROOT/scripts/2legged
+	access_token=`cat $ROOT/data/access_token`
 
     # Now to one upload
-    #length=$((end - pos))
-    #echo "${i} - bytes ${pos}-${end}/${filesz} => ${length}"
-    #echo "tail -c +${tpos} ${fullpath} | head -c ${piecesz}"
-
-    response=$(tail -c +${tpos} ${fullpath} | head -c ${piecesz} | curl --header "Authorization: ${access_token}" --header "Content-Type:application/octet-stream" --header "Session-Id: ${sessionId}" --header "Content-Range: bytes ${pos}-${end}/${filesz}" --data-binary @- -X PUT "${APIHost}oss/v1/buckets/${bucket}/objects/${filenameUri}/resumable" -k --write-out "Response code: %{http_code}")
+    response=$(tail -c +${tpos} ${fullpath} | head -c ${piecesz} \
+        | curl --header "Authorization: ${access_token}" \
+            --header "Content-Type:application/octet-stream" --header "Session-Id: ${sessionId}" \
+            --header "Content-Range: bytes ${pos}-${end}/${filesz}" --data-binary @- \
+            -X PUT "${APIHost}oss/v2/buckets/${bucket}/objects/${filenameUri}/resumable" \
+            --write-out "Response code: %{http_code}")
     #echo $response
 
     status=$(echo $response | sed 's/.*Response code: \([0-9]*\)/\1/')
-    echo "${status} - bytes ${pos}-${end}/${filesz}"
-    response=$(echo $response |  sed "s/Response code: ${status}//")
     if [ "${status}" == "202" ]; then
-        echo $response
+        echo "${status} - bytes ${pos}-${end}/${filesz}"
+        printf "\n"
     elif [ "${status}" == "200" ]; then
-        #echo $response
-        # for v1
-        id=$(echo $response | jsonValueAtPath '["objects"][0]["id"]')
-        location=$(echo $response | jsonValueAtPath '["objects"][0]["location"]')
-        # for v2
-        #id=$(echo $response | jsonValueAtPath '["objectId"]')
-        #location=$(echo $response | jsonValueAtPath '["location"]')
+        echo "${status} - bytes ${pos}-${end}/${filesz}"
+        #echo $response | jq .
+        id=$(echo $response | jq --raw-output .objectId 2>/dev/null)
+        location=$(echo $response | jq --raw-output .location 2>/dev/null)
         echo "ID: $id"
         echo "Location: $location"
+        filenameHdd=`echo "$filenameUri" | sed 's/+/ /g'`
+        echo $response > "$ROOT/data/${bucket}.${filenameHdd}.json"
     else
-        #echo $response
-        msg=$(echo $response | jsonValueAtPath '["developerMessage"]' 2> /dev/null)
-        if [ "$msg" == "" ]; then
-            msg="${status} error!"
-        fi
-        echo $msg
+		reason=$(echo $response | jq --raw-output .reason)
+		if [ "$reason" != "null" ] ; then
+			echo "${reason}"
+		fi
         exit
     fi
 
     total=$((total + piecesz))
 done
-
-# Finally save the details of that object
-response=$(curl -H "Authorization: ${access_token}" -X GET "${APIHost}oss/v1/buckets/${bucket}/objects/${filenameUri}/details" -k)
-echo $response | python -m json.tool
-filenameHdd=`echo "$filenameUri" | sed 's/+/ /g'`
-echo $response > "$ROOT/data/${bucket}.${filenameHdd}.json"

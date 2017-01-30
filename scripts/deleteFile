@@ -1,16 +1,16 @@
 #!/bin/bash
 
-[[ -f ./tools ]] && source ./tools
-[[ -f ./scripts/tools ]] && source ./scripts/tools
-source $ROOT/scripts/credentials
+[[ -f ./_tools ]] && source ./_tools
+[[ -f ./scripts/_tools ]] && source ./scripts/_tools
+source $ROOT/scripts/_config
+
+#    deleteFile <FileKey>
+#          - urn manifest
 
 master=$1
 masterUri=`echo "$master" | sed 's/ /+/g'`
 masterHdd=`echo "$masterUri" | sed 's/+/ /g'`
 
-id=$(cat "$ROOT/data/${bucket}.${masterHdd}.json" | jsonValueAtPath '["objects"][0]["id"]')
-echo $id
-id64=$(xbase64encode $id)
-
-response=$(curl -i -H "Authorization: ${access_token}" -X DELETE ${APIHost}oss/v1/buckets/{$bucket}/objects/{$masterUri} -k)
+response=$(curl -i -H "Authorization: ${access_token}" \
+	-X DELETE ${APIHost}oss/v2/buckets/{$bucket}/objects/{$masterUri} -k)
 echo $response

@@ -1,6 +1,9 @@
+.idea/
 credentials
 credentials.*
 credentials-*
 .DS_Store
 Thumbs.db
 *.bak
+jq
+jq.exe

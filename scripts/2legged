@@ -1,0 +1,50 @@
+#!/bin/bash
+
+[[ -f ./_tools ]] && source ./_tools
+[[ -f ./scripts/_tools ]] && source ./scripts/_tools
+source $ROOT/scripts/_config
+
+#    2legged
+#        - get an application access token (2 legged)
+
+declare -a data=( \
+	client_id=$FORGE_CLIENT_ID \
+	client_secret=$FORGE_CLIENT_SECRET \
+	grant_type=client_credentials \
+	scope=$(join '%20' ${SCOPE[@]}) \
+);
+#printf '%s\n' "${data[@]}"
+
+credentials=$(join '&' ${data[@]})
+response=$(curl \
+	-k \
+	--header "Content-Type: application/x-www-form-urlencoded" \
+	--data "${credentials}" \
+	${APIHost}authentication/v1/authenticate \
+)
+#echo $response | jq .
+
+token_type=$(echo $response | jq --raw-output .token_type)
+if [ "$token_type" == "null" ]; then
+	echo "Failed to get your token"
+	msg=$(echo $response | jq --raw-output .faultstring)
+	if [ "$msg" == "null" ]; then
+		msg=$(echo $response | jq --raw-output .developerMessage)
+	fi
+	echo "  $msg"
+	[[ -f $ROOT/data/access_token ]] && rm $ROOT/data/access_token
+	exit
+fi
+
+access_token=$(echo $response | jq --raw-output '.access_token')
+expires_in=$(echo $response | jq --raw-output .expires_in)
+if [ "$OS" == "Windows_NT" ]; then
+	dt=$(date -d "+${expires_in} seconds")
+else
+	dt=$(date -v "+${expires_in}S")
+fi
+
+echo "Your new access token is: ${token_type} ${access_token}"
+echo "Expires at $dt"
+
+echo "${token_type} ${access_token}" > $ROOT/data/access_token

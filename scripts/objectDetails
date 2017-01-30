@@ -1,13 +1,24 @@
 #!/bin/bash
 
-[[ -f ./tools ]] && source ./tools
-[[ -f ./scripts/tools ]] && source ./scripts/tools
-source $ROOT/scripts/credentials
+[[ -f ./_tools ]] && source ./_tools
+[[ -f ./scripts/_tools ]] && source ./scripts/_tools
+source $ROOT/scripts/_config
+
+#    objectDetails <FileKey>
+#          - file information
 
 master=$1
 masterUri=`echo "$master" | sed 's/ /+/g'`
 masterHdd=`echo "$masterUri" | sed 's/+/ /g'`
 
-response=$(curl -H "Authorization: ${access_token}" -X GET ${APIHost}oss/v1/buckets/${bucket}/objects/${masterUri}/details -k)
-echo $response | python -m json.tool
-#echo $response > "${bucket}.${masterHdd}.json"
+response=$(curl -H "Authorization: ${access_token}" \
+	-X GET ${APIHost}oss/v2/buckets/${bucket}/objects/${masterUri}/details -k)
+
+reason=$(echo $response | jq --raw-output .reason)
+if [ "$reason" != "null" ]; then
+	echo "${reason}"
+	exit
+fi
+
+echo $response | jq .
+echo $response > "$ROOT/data/${bucket}.${masterHdd}.json"

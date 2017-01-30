@@ -1,0 +1,137 @@
+#
+# Copyright (c) 2016 Autodesk, Inc.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+# by Cyrille Fauvel
+# Autodesk Forge Partner Development
+# Septemeber 2016
+#
+#!/bin/bash
+
+ROOT="`dirname \"$0\"`" # Relative
+export ROOT="`( cd \"$ROOT\" && pwd )`" # Absolutized and normalized
+[[ -f ./scripts/_tools ]] && source ./scripts/_tools
+#[[ -f ./scripts/_config ]] && source ./scripts/_config
+
+function usage () {
+	echo '
+  forge command [arg]
+
+    2legged
+        - get an application access token (2 legged)
+    buckets [-s [-a <startAt>] [-l <limit>] [-r <region>]]
+        - list local buckets
+          -s / --server : list buckets on the server
+          -a / --startAt <startAt> : where to start in the list [string, default: none]
+          -l / --limit <limit> : how many to return [integer, default: 10]
+          -r / --region <region> : US or EMEA [string, default: US]
+    bucket [<Name>]
+        - set or get the current bucket
+	bucketCreate <Name> [<Type>]
+		- create a new bucket,
+		  default Type is transient, values can be
+		  transient/temporary/persistent
+    bucketCheck [<Name>]
+        - check bucket validity, outputs the expiration
+          date/time for this bucket
+          if no parameter use the current bucket
+	bucketItems [<Name>] [-a <startAt>] [-l <limit>]
+		- list items in a given bucket
+		  if no parameter use the current bucket
+		  -a / --startAt <startAt> : where to start in the list [string, default: none]
+		  -l / --limit <limit> : how many to return [integer, default: 10]
+    bucketDelete [<Name>]
+          - delete a given bucket
+            if no parameter delete the current bucket
+    upload <File>
+          - upload a file in the current bucket
+    resumable <File> <Pieces>
+          - upload a file in multiple pieces (i.e. resumables)
+    download <FileKey> <OutputFile>
+          - download the file from OSS
+    objectDetails <FileKey>
+          - file information
+    translate <FileKey>
+          - translate the file for viewing
+    translateProgress <FileKey>
+          - file translation progress
+    manifest <FileKey>
+          - urn manifest
+    metadata <FileKey>
+          - urn metadata
+    thumbnail <FileKey>
+          - get thumbnail
+	deleteManifest <FileKey>
+		- delete the manifest and all its translated output files (derivatives).
+	deleteFile <FileKey>
+		- delete the source file from the bucket
+	html <FileKey> <OutputFile>
+		- generate default html page
+'
+}
+
+case "$1" in
+	"help" | "usage" | "-h" | "--help" | "")
+		usage
+		exit
+		;;
+	"bucket")
+		if [ "$2" == "" ]; then
+			echo -n "Current bucket is: "
+			[[ -f $ROOT/data/bucket ]] && cat $ROOT/data/bucket
+			[[ ! -f $ROOT/data/bucket ]] && echo "<not defined>"
+			exit
+		fi
+		bucket=$(bucketName $2)
+		if [ "$bucket" != "" ]; then
+			echo $bucket > $ROOT/data/bucket
+		else
+			echo "Error: missing bucket name or invalid name!"
+			exit
+		fi
+		;;
+	"buckets")
+		if [ "$2" != "-s" ] && [ "$2" != "--server" ]; then
+			regex="(.*)\.bucket\.json"
+			ll=$(ls $ROOT/data/*.bucket.json)
+			for l in $ll; do
+				lb=$(basename $l)
+				[[ $lb =~ $regex ]]
+				name="${BASH_REMATCH[1]}"
+				echo $name
+			done
+			exit
+		fi
+		cmd=$1
+		shift
+		shift # -s / -- server
+		$ROOT/scripts/${cmd} "$@"
+		;;
+	# "2legged")
+	# "bucketCreate") "bucketCheck") "bucketItems") "bucketDelete")
+	# "upload") "resumable") "objectDetails")
+	# "translate") "translateProgress") "manifest") "metadata") "thumbnail")
+	# "deleteManifest") "deleteMetadata") "html")
+	*)
+		cmd=$1
+		shift
+		$ROOT/scripts/${cmd} "$@"
+		;;
+esac

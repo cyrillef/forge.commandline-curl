@@ -1,0 +1,27 @@
+#!/bin/bash
+
+[[ -f ./_tools ]] && source ./_tools
+[[ -f ./scripts/_tools ]] && source ./scripts/_tools
+source $ROOT/scripts/_config
+
+#    translateProgress <FileKey>
+#          - file translation progress
+
+master=$1
+masterUri=`echo "$master" | sed 's/ /+/g'`
+masterHdd=`echo "$masterUri" | sed 's/+/ /g'`
+
+id="urn:adsk.objects:os.object:${bucket}/${masterUri}"
+id64=$(xbase64safeencode $id)
+
+response=$(curl -H "Content-Type: application/json" -H "Authorization: ${access_token}" \
+	-X GET ${APIHost}modelderivative/v2/designdata/${id64}/manifest -k)
+#echo $response | jq .
+
+status=$(echo $response | jq --raw-output .status)
+progress=$(echo $response | jq --raw-output .progress)
+if [ "$status" != "null" ]; then
+	echo "Request: ${status} (${progress})"
+else
+	echo "Pending..."
+fi

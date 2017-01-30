@@ -1,18 +1,21 @@
 #!/bin/bash
 
-[[ -f ./tools ]] && source ./tools
-[[ -f ./scripts/tools ]] && source ./scripts/tools
-source $ROOT/scripts/credentials
+[[ -f ./_tools ]] && source ./_tools
+[[ -f ./scripts/_tools ]] && source ./scripts/_tools
+source $ROOT/scripts/_config
+
+#    thumbnail <FileKey>
+#          - get thumbnail
 
 master=$1
 masterUri=`echo "$master" | sed 's/ /+/g'`
 masterHdd=`echo "$masterUri" | sed 's/+/ /g'`
 
-id=$(cat "$ROOT/data/${bucket}.${masterHdd}.json" | jsonValueAtPath '["objects"][0]["id"]')
-id64=$(xbase64encode $id)
+id="urn:adsk.objects:os.object:${bucket}/${masterUri}"
+id64=$(xbase64safeencode $id)
 
-# Get the thumnbail
-curl -H "Content-Type: application/json" -H "Authorization: ${access_token}" -X GET ${APIHost}viewingservice/v1/thumbnails/${id64} -k > "$ROOT/temp/${masterHdd}.png"
+curl -H "Content-Type: application/json" -H "Authorization: ${access_token}" \
+	-X GET ${APIHost}viewingservice/v1/thumbnails/${id64} -k > "$ROOT/temp/${masterHdd}.png"
 
 if [ -f "$ROOT/temp/${masterHdd}.png" ] && [ -s "$ROOT/temp/${masterHdd}.png" ]; then
     test=`file "$ROOT/temp/${masterHdd}.png" | grep "PNG image data"`
@@ -20,6 +23,7 @@ if [ -f "$ROOT/temp/${masterHdd}.png" ] && [ -s "$ROOT/temp/${masterHdd}.png" ];
 		if [ "$OS" == "Windows_NT" ]; then
 			echo "Your preview file is stored in '$ROOT/temp/${masterHdd}.png'"
 		else
+			echo "Your preview file is stored in '$ROOT/temp/${masterHdd}.png'"
 			open "$ROOT/temp/${masterHdd}.png"
 		fi
     else
