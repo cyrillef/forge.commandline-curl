@@ -48,6 +48,7 @@ function usage () {
 		- create a new bucket,
 		  default Type is transient, values can be
 		  transient/temporary/persistent
+		  -r / --region <region> : US or EMEA [string, default: US]
     bucketCheck [<Name>]
         - check bucket validity, outputs the expiration
           date/time for this bucket

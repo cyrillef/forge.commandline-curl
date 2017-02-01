@@ -8,6 +8,7 @@ source $ROOT/scripts/_config
 #		- create a new bucket,
 #		  default Type is transient, values can be
 #		  transient/temporary/persistent
+#         -r / --region <region> : US or EMEA [string, default: US]
 
 bucket=$(bucketName $1)
 if [[ "$bucket" == "" ]]; then
@@ -19,6 +20,21 @@ bucketType=$2
 if [[ "$bucketType" == "" ]]; then
 	bucketType="transient"
 fi
+
+region="US"
+while [[ $# -gt 1 ]]; do
+	key="$1"
+	case $key in
+        -r|--region)
+            region="$2"
+            shift # past argument
+            ;;
+        *)
+            # unknown option
+            ;;
+	esac
+	shift # past argument or value
+done
 
 # Does it exist already? (see bucketCheck)
 response=$(curl -H "Authorization: ${access_token}" -X GET ${APIHost}oss/v2/buckets/${bucket}/details -k)
@@ -36,6 +52,7 @@ if [ "$reason" != "Bucket not found" ]; then
 fi
 
 response=$(curl --header "Content-Type: application/json" --header "Authorization: ${access_token}" \
+	--header "x-ads-region: ${region}" \
 	--data "{\"bucketKey\":\"${bucket}\",\"policy\":\"${bucketType}\"}" ${APIHost}oss/v2/buckets -k)
 #echo $response | jq .
 
