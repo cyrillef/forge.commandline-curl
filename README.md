@@ -69,7 +69,7 @@ The ./forge scripts provide quick help information for the commands and argument
 A typical workflow is:
 
     # Do authentication
-    ./forge auth
+    ./forge 2legged
 
     # Create a bucket. Bucket name must be lower case and valid characters
     ./forge bucketCreate my_bucket_name
