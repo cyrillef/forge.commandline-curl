@@ -53,10 +53,10 @@ fi
 
 response=$(curl --header "Content-Type: application/json" --header "Authorization: ${access_token}" \
 	--header "x-ads-region: ${region}" \
-	--data "{\"bucketKey\":\"${bucket}\",\"policy\":\"${bucketType}\"}" ${APIHost}oss/v2/buckets -k)
+	--data "{\"bucketKey\":\"${bucket}\",\"policyKey\":\"${bucketType}\"}" ${APIHost}oss/v2/buckets -k)
 #echo $response | jq .
 
-key=$(echo $response | jq --raw-output .key)
+key=$(echo $response | jq --raw-output .bucketKey)
 if [ "$key" == "null" ]; then
 	reason=$(echo $response | jq --raw-output .reason)
 	echo "Error - ${reason}"
