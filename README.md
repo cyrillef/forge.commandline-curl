@@ -110,6 +110,7 @@ It provides a nice terminal windows running Bash v4.3 and cUrl v7.51 already ins
   4. Put the sample directory into the PATH.
   5. You can now continue with the normal setup instructions.
 
+![thumbnail](/default.png)
 
 ## License
 
