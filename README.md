@@ -8,7 +8,7 @@
 [![Data-Management](https://img.shields.io/badge/Data%20Management-v1-green.svg)](http://autodesk-forge.github.io/)
 [![OSS](https://img.shields.io/badge/OSS-v2-green.svg)](http://autodesk-forge.github.io/)
 [![Model-Derivative](https://img.shields.io/badge/Model%20Derivative-v2-green.svg)](http://autodesk-forge.github.io/)
-[![Viewer](https://img.shields.io/badge/Forge%20Viewer-v2.17-green.svg)](http://autodesk-forge.github.io/)
+[![Viewer](https://img.shields.io/badge/Forge%20Viewer-v3.3-green.svg)](http://autodesk-forge.github.io/)
 
 
 # forge.commandline-curl
@@ -110,7 +110,6 @@ It provides a nice terminal windows running Bash v4.3 and cUrl v7.51 already ins
   4. Put the sample directory into the PATH.
   5. You can now continue with the normal setup instructions.
 
-![thumbnail](/default.png)
 
 ## License
 
