@@ -1,4 +1,3 @@
-[![build status](https://api.travis-ci.org/cyrillef/models.autodesk.io.png)](https://travis-ci.org/cyrillef/models.autodesk.io)
 [![cUrl](https://img.shields.io/badge/cUrl-7.47.1-blue.svg)](https://nodejs.org/)
 ![Platforms](https://img.shields.io/badge/platform-windows%20%7C%20osx%20%7C%20linux-lightgray.svg)
 [![License](http://img.shields.io/:license-mit-blue.svg)](http://opensource.org/licenses/MIT)
@@ -8,7 +7,7 @@
 [![Data-Management](https://img.shields.io/badge/Data%20Management-v1-green.svg)](http://autodesk-forge.github.io/)
 [![OSS](https://img.shields.io/badge/OSS-v2-green.svg)](http://autodesk-forge.github.io/)
 [![Model-Derivative](https://img.shields.io/badge/Model%20Derivative-v2-green.svg)](http://autodesk-forge.github.io/)
-[![Viewer](https://img.shields.io/badge/Forge%20Viewer-v3.3-green.svg)](http://autodesk-forge.github.io/)
+[![Viewer](https://img.shields.io/badge/Forge%20Viewer-v6.2-green.svg)](http://autodesk-forge.github.io/)
 
 
 # forge.commandline-curl
@@ -39,8 +38,8 @@ Standard OS functionality, Bash, cURL and JQ.
 * https://en.wikipedia.org/wiki/Bash_(Unix_shell)
 * https://stedolan.github.io/jq/
 
-This sample targets Mac OSX and Unix only, it should run on different distribution of Linux but was tested 
-on Ubuntu and Fedora only at this time. 
+This sample targets Mac OSX and Unix only, it should run on different distribution of Linux but was tested
+on Ubuntu and Fedora only at this time.
 
 Windows user, you need to install a Unix shell like [cygwin](http://cygwin.com) or [Git for Windows](https://git-scm.com/download/win),
 but the sample requires bash 3.2 minimum to run. See the Windows special setup instructions for more details.
@@ -113,7 +112,7 @@ It provides a nice terminal windows running Bash v4.3 and cUrl v7.51 already ins
 
 ## License
 
-This sample is licensed under the terms of the [MIT License](http://opensource.org/licenses/MIT). 
+This sample is licensed under the terms of the [MIT License](http://opensource.org/licenses/MIT).
 Please see the [LICENSE](LICENSE) file for full details.
 
 

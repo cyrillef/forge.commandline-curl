@@ -16,7 +16,7 @@ fullpath=$1
 filename=$(basename "$fullpath")
 filenameUri=`echo "$filename" | sed 's/ /+/g'`
 
-response=$(curl --header "Authorization: ${access_token}" -H "Content-Type:application/octet-stream" \
+response=$(curl --header "Authorization: ${access_token}" -H "Content-Type: application/octet-stream" \
 	--upload-file "$fullpath" -X PUT "${APIHost}oss/v2/buckets/${bucket}/objects/${filenameUri}" -k)
 #echo $response | jq .
 
