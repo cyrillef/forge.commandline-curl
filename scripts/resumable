@@ -47,7 +47,7 @@ for i in $(seq 1 $pieces); do
 	access_token=`cat $ROOT/data/access_token`
 
     # Now to one upload
-    response=$(tail -c +${tpos} ${fullpath} | head -c ${piecesz} \
+    response=$(tail -c +${tpos} "${fullpath}" | head -c ${piecesz} \
         | curl --header "Authorization: ${access_token}" \
             --header "Content-Type:application/octet-stream" --header "Session-Id: ${sessionId}" \
             --header "Content-Range: bytes ${pos}-${end}/${filesz}" --data-binary @- \
